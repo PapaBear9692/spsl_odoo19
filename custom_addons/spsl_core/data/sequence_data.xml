@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_spsl_approval_request" model="ir.sequence">
+        <field name="name">SPSL Approval Request</field>
+        <field name="code">spsl.approval.request</field>
+        <field name="prefix">APR/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+    <record id="seq_spsl_audit_log" model="ir.sequence">
+        <field name="name">SPSL Audit Log</field>
+        <field name="code">spsl.audit.log</field>
+        <field name="prefix">AUD/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+    <record id="seq_spsl_notification_log" model="ir.sequence">
+        <field name="name">SPSL Notification Log</field>
+        <field name="code">spsl.notification.log</field>
+        <field name="prefix">NOT/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+    <record id="seq_spsl_commission_entry" model="ir.sequence">
+        <field name="name">SPSL Commission Entry</field>
+        <field name="code">spsl.commission.entry</field>
+        <field name="prefix">CME/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+    <record id="seq_spsl_commission_aggregation" model="ir.sequence">
+        <field name="name">SPSL Commission Aggregation</field>
+        <field name="code">spsl.commission.aggregation</field>
+        <field name="prefix">CMA/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>

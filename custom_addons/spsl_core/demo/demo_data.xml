@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demo Approval Levels -->
+    <record id="demo_approval_level_1" model="spsl.approval.level">
+        <field name="name">Level 1 - Manager</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="demo_approval_level_2" model="spsl.approval.level">
+        <field name="name">Level 2 - Director</field>
+        <field name="sequence">20</field>
+        <field name="is_escalation">1</field>
+        <field name="escalation_hours">48</field>
+    </record>
+    <record id="demo_approval_level_3" model="spsl.approval.level">
+        <field name="name">Level 3 - CEO</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <!-- Demo Commission Rules -->
+    <record id="demo_commission_rule_sales" model="spsl.commission.rule">
+        <field name="name">Sales Commission 5%</field>
+        <field name="code">SALES_5PCT</field>
+        <field name="calculation_type">percentage</field>
+        <field name="percentage">5.0</field>
+    </record>
+    <record id="demo_commission_rule_target" model="spsl.commission.rule">
+        <field name="name">Target Bonus Commission</field>
+        <field name="code">TARGET_BONUS</field>
+        <field name="calculation_type">fixed</field>
+        <field name="fixed_amount">10000</field>
+    </record>
+</odoo>

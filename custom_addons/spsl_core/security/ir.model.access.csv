@@ -1,0 +1,43 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+# Approval Models - read/write for approval_manager, full CRUD
+access_spsl_approval_request_user,spsl.approval.request.user,spsl_core_group_user,1,0,0
+access_spsl_approval_request_manager,spsl.approval.request.manager,spsl_core_group_manager,1,1,1,1
+# Audit models - read-only for audit_viewer, no access for others
+access_spsl_notification_event_user,spsl.notification.event.user,1,0,0
+access_spsl_notification_event_manager,spsl.notification.admin,spsl_core_group_manager,1,1,1,1
+# Commission models - full CRUD by commission_manager, read for for by sales groups
+access_spsl_commission_entry.line_user,spsl.core_group_user,1,0,0
+access_spsl_commission_entry_line_user,spsl.core_group_user,1,0,0
+access_spsl_commission_entry_line_user,spsl.core_group_user,1,0,0
+access_spsl_commission_aggregation_user,spsl.core_group_manager,1,1,1,1
+# Base groups - read-only for all
+access_spsl_base_user,spsl_base_user,1,0,0
+access_spsl_base_user,spsl_base_user,1,0,0
+access_spsl_base_manager,spsl.base_manager,1,1,1,1
+# Audit Log - read-only by audit_viewer, no access for others
+access_spsl_audit_config_user,spsl.audit.config.user,1,0,0
+access_spsl_audit_config_manager,spsl.audit.config,1,1,1,1
+# Audit Config - full CRUD by notification_admin, read/write by notification admin, no access for others
+access_spsl_notification_admin,spsl.notification.template,spsl.notification.admin,1,1,1,1
+# notification log - full CRUD by notification_admin
+ no access for others
+access_spsl_notification_log_user,spsl.notification.log.user,1,0,0
+access_spsl_notification_log_manager,spsl.notification.log.manager,spsl_core_group_manager,1,1,1,1
+# commission entry lines - full CRUD by commission_manager
+ read-only by sales groups
+access_spsl_commission_entry_line_user,spsl.core_group_user,1,0,0
+access_spsl_commission_entry_line_manager,spsl.commission_manager,1,1,1,1
+# Commission entry lines - read-only by commission_entry line user, read-only by sales groups
+access_spsl_commission_entry_line_user,spsl.core_group_user,1,0,0
+access_spsl_commission_entry_line_user,spsl.core_group_manager,1,1,1,1
+# Commission aggregation - full CRUD by commission_manager, read-only by sales groups, no access
+access_spsl_commission_aggregation_user,spsl.core_group_user,1,0,0
+access_spsl_commission_aggregation_manager,spsl.core_group_manager,1,1,1,1
+
+# Commission rule - full CRUD by commission_manager, read-only by sales groups
+access_spsl_commission_rule_user,spsl.core_group_user,1,0,0
+access_spsl_commission_rule_user,spsl.core_group_user,1,0,0
+access_spsl_commission_rule_manager,spsl.core_group_manager,1,1,1,1
+# HQ All branches - full CRUD by HQ admin ( read-only by manager
+access_spsl.hq_all_branches,spsl.core_group_manager,1,0,0
+access_spsl_hq_all_branches_user,spsl.core_group_user,1,0,0

@@ -1,0 +1,112 @@
+/**
+ * Copyright 2026 SPSL - Smart Printing Service Limited
+ * License OPL-1
+ *
+ * SPSL Core Styles
+ */
+
+/* SPSL Brand Variables */
+:root {
+    --spsl-primary-color: #1a73e8;
+    --spsl-secondary-color: #34a853;
+    --spsl-danger-color: #ea4335;
+    --spsl-warning-color: #fbbc04;
+    --spsl-info-color: #4285f4;
+    --spsl-text-color: #333333;
+    --spsl-bg-color: #ffffff;
+    --spsl-border-color: #e0e0e0;
+}
+
+/* Approval Badge Styles */
+.spsl-approval-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.spsl-approval-draft {
+    background-color: #e0e0e0;
+    color: #616161;
+}
+
+.spsl-approval-pending {
+    background-color: #fff3e0;
+    color: #e65100;
+}
+
+.spsl-approval-approved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.spsl-approval-rejected {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* Notification Badge Styles */
+.spsl-notification-badge {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.spsl-notification-icon {
+    font-size: 18px;
+}
+
+.spsl-notification-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--spsl-danger-color);
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.spsl-notification-unread .spsl-notification-icon {
+    animation: spsl-pulse 2s infinite;
+}
+
+@keyframes spsl-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Approval Status Card */
+.spsl-approval-status-card {
+    border: 1px solid var(--spsl-border-color);
+    border-radius: 8px;
+    background-color: var(--spsl-bg-color);
+    padding: 16px;
+    margin: 8px 0;
+}
+
+.spsl-approval-header {
+    border-bottom: 1px solid var(--spsl-border-color);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.spsl-approval-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--spsl-text-color);
+}
+
+.spsl-approval-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.spsl-approval-request {
+    font-size: 13px;
+    color: #757575;
+}

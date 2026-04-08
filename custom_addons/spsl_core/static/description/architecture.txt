@@ -1,0 +1,210 @@
+================================================================================
+SPSL Core Module - Architecture Decision Record
+================================================================================
+
+Document ID: ADR-001
+Status: Approved
+Date: 2026-04-08
+Author: Unisoft Solutions
+
+================================================================================
+1. MIXIN INHERITANCE STRATEGY
+================================================================================
+
+DECISION:
+Use Odoo AbstractModel mixins for composition over deep inheritance.
+
+RATIONALE:
+- **Single Responsibility Principle (SRP)**: Each mixin handles one concern
+  - ApprovalMixin → approval workflow logic
+  - AuditMixin → audit trail logging
+  - BranchMixin → multi-branch isolation
+- **Open/Closed Principle**: Mixins can be used independently or combined
+- **Testability**: Each mixin can be unit tested in isolation
+- **Flexibility**: Business models choose which features to inherit
+- **Odoo Native Support**: Odoo ORM handles multi-inheritance natively via `_inherit`
+
+IMPLEMENTATION:
+```python
+# Mixin definition (abstract model)
+class ApprovalMixin(models.AbstractModel):
+    _name = 'spsl.mixin.approval'
+    _description = 'Approval Workflow Mixin'
+
+    approval_state = fields.Selection([...])
+    approval_request_id = fields.Many2one('spsl.approval.request', ...)
+
+# Usage in business model
+class MyBusinessModel(models.Model):
+    _name = 'my.business.model'
+    _inherit = ['spsl.mixin.approval', 'spsl.mixin.audit']
+
+    name = fields.Char(...)
+    # Automatically inherits approval_state, approval_request_id, etc.
+```
+
+TRADE-OFFS:
+- **Method Resolution Order (MRO)**: When multiple mixins define same method name,
+  Python's MRO applies (left-to-right in _inherit list)
+- **Field Name Conflicts**: Avoid duplicate field names across mixins
+
+================================================================================
+2. APPROVAL ENGINE DESIGN
+================================================================================
+
+DECISION:
+Configurable approval rules stored in database (not hardcoded).
+
+RATIONALE:
+- **Business Flexibility**: Non-developers can modify approval thresholds
+- **Multi-Level Support**: Unlimited approval levels per document type
+- **Conditional Approvals**: Rules can depend on field values (amount, OU, etc.)
+- **Audit Compliance**: All approval actions logged for audit trail
+
+IMPLEMENTATION:
+``python
+# Models
+spsl.approval.level      # Defines approval hierarchy
+spsl.approval.request     # Tracks approval instances
+spsl.approval.transition  # State transitions (TODO: create file)
+
+# Mixin Usage
+class SalesOrder(models.Model):
+    _inherit = ['spsl.mixin.approval']
+
+    def _compute_requires_approval(self):
+        # Check if amount exceeds threshold
+        for record in self:
+            record.requires_approval = record.amount > 10000
+```
+
+WORKFLOW:
+1. Record created → approval_state = 'draft'
+2. User clicks "Submit for Approval" → approval_state = 'pending'
+3. Approvers receive notification
+4. Approver approves/rejects → approval_state = 'approved'/'rejected'
+5. If rejected, can reset to 'draft' for resubmission
+
+================================================================================
+3. AUDIT TRAIL CHAIN ALGORITHM
+================================================================================
+
+DECISION:
+Use SHA-256 hash chain for tamper-evident audit logs.
+
+RATIONALE:
+- **Integrity Verification**: Any modification breaks the chain
+- **Compliance**: Meets audit requirements for financial systems
+- **Simplicity**: Standard algorithm with good library support
+- **Performance**: Fast computation, suitable for high-volume logging
+
+IMPLEMENTATION:
+```python
+class AuditLog(models.Model):
+    _name = 'spsl.audit.log'
+
+    previous_hash = fields.Char()  # Hash of previous entry
+    hash = fields.Char(compute='_compute_hash')  # Current entry hash
+
+    def _compute_hash(self):
+        data = f"{self.previous_hash}{self.write_date}{self.user_id.id}"
+        data += json.dumps(self.changes)
+        return hashlib.sha256(data.encode()).hexdigest()
+```
+
+CHAIN VERIFICATION:
+- Each entry links to previous entry via hash
+- Genesis entry (first) uses zero hash
+- Tampering detection: Recompute all hashes from genesis
+
+================================================================================
+4. NOTIFICATION DISPATCHER PATTERN
+================================================================================
+
+DECISION:
+Event-driven notification system using Observer pattern.
+
+RATIONALE:
+- **Loose Coupling**: Event producers don't know about consumers
+- **Multiple Channels**: Email, in-app, SMS (future)
+- **Extensibility**: Add new notification types without code changes
+- **Template Management**: Business users can edit templates
+
+IMPLEMENTATION:
+``python
+# Models
+spsl.notification.event      # Event definitions
+spsl.notification.template   # Message templates
+spsl.notification.log        # Sent notification records
+
+# Trigger Pattern
+def action_submit_for_approval(self):
+    # ... create approval request ...
+    # Trigger notification
+    self.env['spsl.notification.event'].notify(
+        'approval.submitted',
+        {'record': self, 'approvers': approver_ids}
+    )
+```
+
+CHANNELS:
+1. **Email**: Via Odoo mail module (immediate)
+2. **In-App**: Via Odoo bus (real-time)
+3. **SMS**: Via Odoo SMS module (future)
+
+FLOW:
+┌─────────────┐    ┌──────────────┐    ┌─────────────┐
+│   Event     │──->│  Template    │──->│   Channel    │
+│  (approval)  │    │  Rendering  │    │  Delivery   │
+└─────────────┘    └──────────────┘    └─────────────┘
+                         │
+                         v
+                   ┌─────────────┐
+                   │  Log Entry  │
+                   └─────────────┘
+
+================================================================================
+5. DATA ISOLATION STRATEGY
+================================================================================
+
+DECISION:
+Record-level security rules (ir.rule) for automatic data filtering.
+
+RATIONALE:
+- **Simplicity**: Declarative rules in XML, No manual filtering
+- **Performance**: Database-level filtering (efficient)
+- **Consistency**: Applies to all related records automatically
+- **Security**: Cannot be bypassed by search() calls
+
+IMPLEMENTATION:
+```xml
+<!-- In security/spsl_core_security.xml -->
+<record id="spsl_branch_isolation_rule" model="ir.rule">
+    <field name="name">SPSL Branch Isolation</field>
+    <field name="model_id" ref="model_spsl_approval_request"/>
+    <field name="domain_force">[('operating_unit_id', 'in', user.operating_unit_ids)]</field>
+    <field name="perm_read" eval="True"/>
+    <field name="perm_write" eval="True"/>
+    <field name="perm_create" eval="True"/>
+    <field name="perm_unlink" eval="True"/>
+</record>
+```
+
+**NOTE:** Currently commented out until `operating_unit` module is installed.
+
+SPECIAL ACCESS:
+- **HQ Override**: Users with `group_hq_all_branches` bypass OU restrictions
+- **Manager Access**: Can see all OUs in their OU
+- **Self-Service**: Users see only their own OU
+
+ future Considerations:
+- Consider using Odoo 19's new `active_test_language` for boolean field testing
+- Performance monitoring for large audit logs
+- Backup strategy for hash chain
+
+================================================================================
+REFERENCES
+================================================================================
+- Odoo 19 ORM Documentation: https://www.odoo.com/documentation/19.0/developer.html
+- OCA Operating Unit Module: https://github.com/OCA/operating-unit
+- SPSL Business Requirements (internal document)

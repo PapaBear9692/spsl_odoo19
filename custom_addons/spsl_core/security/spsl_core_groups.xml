@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Base SPSL User group -->
+    <record id="spsl_core_group_user" model="res.groups">
+        <field name="name">SPSL Core: User</field>
+        <field name="comment">Base SPSL user access</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- SPSL Manager group -->
+    <record id="spsl_core_group_manager" model="res.groups">
+        <field name="name">SPSL Core: Manager</field>
+        <field name="comment">SPSL manager with additional permissions</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_user'))]"/>
+    </record>
+
+    <!-- SPSL Administrator group -->
+    <record id="spsl_core_group_admin" model="res.groups">
+        <field name="name">SPSL Core: Administrator</field>
+        <field name="comment">Full SPSL administrative access</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_manager'))]"/>
+    </record>
+
+    <!-- Approval Manager group -->
+    <record id="group_spsl_approval_manager" model="res.groups">
+        <field name="name">Approval Manager</field>
+        <field name="comment">Can configure approval rules and act as approver</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_user'))]"/>
+    </record>
+
+    <!-- Audit Viewer group -->
+    <record id="group_spsl_audit_viewer" model="res.groups">
+        <field name="name">Audit Viewer</field>
+        <field name="comment">Can view audit logs (CFO, System Admin, Auditor only)</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_user'))]"/>
+    </record>
+
+    <!-- Notification Admin group -->
+    <record id="group_spsl_notification_admin" model="res.groups">
+        <field name="name">Notification Admin</field>
+        <field name="comment">Can manage notification templates</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_user'))]"/>
+    </record>
+
+    <!-- Commission Manager group -->
+    <record id="group_spsl_commission_manager" model="res.groups">
+        <field name="name">Commission Manager</field>
+        <field name="comment">Can configure commission rules and confirm entries</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_user'))]"/>
+    </record>
+
+    <!-- HQ All Branches group -->
+    <record id="group_hq_all_branches" model="res.groups">
+        <field name="name">HQ All Branches</field>
+        <field name="comment">HQ override for multi-branch access</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_manager'))]"/>
+    </record>
+</odoo>

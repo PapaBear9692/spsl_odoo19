@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Test Approval Model Menu -->
+    <record id="action_spsl_test_approval" model="ir.actions.act_window">
+        <field name="name">Test Approval</field>
+        <field name="res_model">spsl.test.approval</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_spsl_test_approval"
+              name="Test Approval"
+              action="action_spsl_test_approval"
+              parent="base.menu_custom"/>
+
+    <record id="view_spsl_test_approval_tree" model="ir.ui.view">
+        <field name="name">spsl.test.approval.tree</field>
+        <field name="model">spsl.test.approval</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="amount"/>
+                <field name="approval_state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_spsl_test_approval_form" model="ir.ui.view">
+        <field name="name">spsl.test.approval.form</field>
+        <field name="model">spsl.test.approval</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit_for_approval" string="Submit for Approval"
+                            type="object" class="btn-primary"
+                            invisible="approval_state != 'draft'"/>
+                    <button name="action_approve" string="Approve"
+                            type="object" class="btn-success"
+                            invisible="approval_state != 'pending'"/>
+                    <button name="action_reject" string="Reject"
+                            type="object" class="btn-danger"
+                            invisible="approval_state != 'pending'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="approval_state not in ('rejected', 'approved')"/>
+                    <field name="approval_state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="amount"/>
+                        <field name="requires_approval"/>
+                        <field name="approval_request_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Test Audit Model Menu -->
+    <record id="action_spsl_test_audit" model="ir.actions.act_window">
+        <field name="name">Test Audit</field>
+        <field name="res_model">spsl.test.audit</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_spsl_test_audit"
+              name="Test Audit"
+              action="action_spsl_test_audit"
+              parent="base.menu_custom"/>
+
+    <record id="view_spsl_test_audit_tree" model="ir.ui.view">
+        <field name="name">spsl.test.audit.tree</field>
+        <field name="model">spsl.test.audit</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="value"/>
+                <field name="write_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_spsl_test_audit_form" model="ir.ui.view">
+        <field name="name">spsl.test.audit.form</field>
+        <field name="model">spsl.test.audit</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="value"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Test Branch Model Menu -->
+    <record id="action_spsl_test_branch" model="ir.actions.act_window">
+        <field name="name">Test Branch</field>
+        <field name="res_model">spsl.test.branch</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_spsl_test_branch"
+              name="Test Branch"
+              action="action_spsl_test_branch"
+              parent="base.menu_custom"/>
+
+    <record id="view_spsl_test_branch_tree" model="ir.ui.view">
+        <field name="name">spsl.test.branch.tree</field>
+        <field name="model">spsl.test.branch</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="operating_unit_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_spsl_test_branch_form" model="ir.ui.view">
+        <field name="name">spsl.test.branch.form</field>
+        <field name="model">spsl.test.branch</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="operating_unit_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

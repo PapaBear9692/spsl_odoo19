@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Approval Events -->
+    <record id="event_approval_submit" model="spsl.notification.event">
+        <field name="name">Approval Submitted</field>
+        <field name="code">approval.submit</field>
+        <field name="category">approval</field>
+    </record>
+    <record id="event_approval_approved" model="spsl.notification.event">
+        <field name="name">Approval Approved</field>
+        <field name="code">approval.approved</field>
+        <field name="category">approval</field>
+    </record>
+    <record id="event_approval_rejected" model="spsl.notification.event">
+        <field name="name">Approval Rejected</field>
+        <field name="code">approval.rejected</field>
+        <field name="category">approval</field>
+    </record>
+    <record id="event_approval_escalated" model="spsl.notification.event">
+        <field name="name">Approval Escalated</field>
+        <field name="code">approval.escalated</field>
+        <field name="category">approval</field>
+    </record>
+
+    <!-- Document Events -->
+    <record id="event_document_created" model="spsl.notification.event">
+        <field name="name">Document Created</field>
+        <field name="code">document.created</field>
+        <field name="category">document</field>
+    </record>
+    <record id="event_document_updated" model="spsl.notification.event">
+        <field name="name">Document Updated</field>
+        <field name="code">document.updated</field>
+        <field name="category">document</field>
+    </record>
+    <record id="event_document_deleted" model="spsl.notification.event">
+        <field name="name">Document Deleted</field>
+        <field name="code">document.deleted</field>
+        <field name="category">document</field>
+    </record>
+    <record id="event_document_approved" model="spsl.notification.event">
+        <field name="name">Document Approved</field>
+        <field name="code">document.approved</field>
+        <field name="category">document</field>
+    </record>
+
+    <!-- Alert Events -->
+    <record id="alert_expiry_warning" model="spsl.notification.event">
+        <field name="name">Expiry Warning</field>
+        <field name="code">alert.expiry.warning</field>
+        <field name="category">alert</field>
+    </record>
+    <record id="alert_low_stock" model="spsl.notification.event">
+        <field name="name">Low Stock Alert</field>
+        <field name="code">alert.low.stock</field>
+        <field name="category">alert</field>
+    </record>
+    <record id="alert_payment_overdue" model="spsl.notification.event">
+        <field name="name">Payment Overdue</field>
+        <field name="code">alert.payment.overdue</field>
+        <field name="category">alert</field>
+    </record>
+
+    <!-- Reminder Events -->
+    <record id="reminder_follow_up" model="spsl.notification.event">
+        <field name="name">Follow Up Reminder</field>
+        <field name="code">reminder.follow.up</field>
+        <field name="category">reminder</field>
+    </record>
+    <record id="reminder_contract_renewal" model="spsl.notification.event">
+        <field name="name">Contract Renewal Reminder</field>
+        <field name="code">reminder.contract.renewal</field>
+        <field name="category">reminder</field>
+    </record>
+    <record id="reminder_sla_breach" model="spsl.notification.event">
+        <field name="name">SLA Breach Reminder</field>
+        <field name="code">reminder.sla.breach</field>
+        <field name="category">reminder</field>
+    </record>
+
+    <!-- System Events -->
+    <record id="system_user_created" model="spsl.notification.event">
+        <field name="name">User Created</field>
+        <field name="code">system.user.created</field>
+        <field name="category">system</field>
+    </record>
+    <record id="system_user_deactivated" model="spsl.notification.event">
+        <field name="name">User Deactivated</field>
+        <field name="code">system.user.deactivated</field>
+        <field name="category">system</field>
+    </record>
+    <record id="system_password_changed" model="spsl.notification.event">
+        <field name="name">Password Changed</field>
+        <field name="code">system.password.changed</field>
+        <field name="category">system</field>
+    </record>
+    <record id="system_error" model="spsl.notification.event">
+        <field name="name">System Error</field>
+        <field name="code">system.error</field>
+        <field name="category">system</field>
+    </record>
+</odoo>
