@@ -13,7 +13,7 @@ class NotificationEvent(models.Model):
     code = fields.Char(
         string='Event Code',
         required=True,
-        unique=True,
+        # unique=True removed - not supported in Odoo 19
         index=True,
     )
     category = fields.Selection(

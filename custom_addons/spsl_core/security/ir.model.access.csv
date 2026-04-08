@@ -1,43 +1,29 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-# Approval Models - read/write for approval_manager, full CRUD
-access_spsl_approval_request_user,spsl.approval.request.user,spsl_core_group_user,1,0,0
-access_spsl_approval_request_manager,spsl.approval.request.manager,spsl_core_group_manager,1,1,1,1
-# Audit models - read-only for audit_viewer, no access for others
-access_spsl_notification_event_user,spsl.notification.event.user,1,0,0
-access_spsl_notification_event_manager,spsl.notification.admin,spsl_core_group_manager,1,1,1,1
-# Commission models - full CRUD by commission_manager, read for for by sales groups
-access_spsl_commission_entry.line_user,spsl.core_group_user,1,0,0
-access_spsl_commission_entry_line_user,spsl.core_group_user,1,0,0
-access_spsl_commission_entry_line_user,spsl.core_group_user,1,0,0
-access_spsl_commission_aggregation_user,spsl.core_group_manager,1,1,1,1
-# Base groups - read-only for all
-access_spsl_base_user,spsl_base_user,1,0,0
-access_spsl_base_user,spsl_base_user,1,0,0
-access_spsl_base_manager,spsl.base_manager,1,1,1,1
-# Audit Log - read-only by audit_viewer, no access for others
-access_spsl_audit_config_user,spsl.audit.config.user,1,0,0
-access_spsl_audit_config_manager,spsl.audit.config,1,1,1,1
-# Audit Config - full CRUD by notification_admin, read/write by notification admin, no access for others
-access_spsl_notification_admin,spsl.notification.template,spsl.notification.admin,1,1,1,1
-# notification log - full CRUD by notification_admin
- no access for others
-access_spsl_notification_log_user,spsl.notification.log.user,1,0,0
-access_spsl_notification_log_manager,spsl.notification.log.manager,spsl_core_group_manager,1,1,1,1
-# commission entry lines - full CRUD by commission_manager
- read-only by sales groups
-access_spsl_commission_entry_line_user,spsl.core_group_user,1,0,0
-access_spsl_commission_entry_line_manager,spsl.commission_manager,1,1,1,1
-# Commission entry lines - read-only by commission_entry line user, read-only by sales groups
-access_spsl_commission_entry_line_user,spsl.core_group_user,1,0,0
-access_spsl_commission_entry_line_user,spsl.core_group_manager,1,1,1,1
-# Commission aggregation - full CRUD by commission_manager, read-only by sales groups, no access
-access_spsl_commission_aggregation_user,spsl.core_group_user,1,0,0
-access_spsl_commission_aggregation_manager,spsl.core_group_manager,1,1,1,1
-
-# Commission rule - full CRUD by commission_manager, read-only by sales groups
-access_spsl_commission_rule_user,spsl.core_group_user,1,0,0
-access_spsl_commission_rule_user,spsl.core_group_user,1,0,0
-access_spsl_commission_rule_manager,spsl.core_group_manager,1,1,1,1
-# HQ All branches - full CRUD by HQ admin ( read-only by manager
-access_spsl.hq_all_branches,spsl.core_group_manager,1,0,0
-access_spsl_hq_all_branches_user,spsl.core_group_user,1,0,0
+access_spsl_approval_request_user,spsl.approval.request.user,model_spsl_approval_request,spsl_core_group_user,1,0,0,0
+access_spsl_approval_request_manager,spsl.approval.request.manager,model_spsl_approval_request,group_spsl_approval_manager,1,1,1,1
+access_spsl_approval_level_user,spsl.approval.level.user,model_spsl_approval_level,spsl_core_group_user,1,0,0,0
+access_spsl_approval_level_manager,spsl.approval.level.manager,model_spsl_approval_level,group_spsl_approval_manager,1,1,1,1
+access_spsl_approval_transition_user,spsl.approval.transition.user,model_spsl_approval_transition,spsl_core_group_user,1,0,0,0
+access_spsl_approval_transition_manager,spsl.approval.transition.manager,model_spsl_approval_transition,group_spsl_approval_manager,1,1,1,1
+access_spsl_approval_rule_user,spsl.approval.rule.user,model_spsl_approval_rule,spsl_core_group_user,1,0,0,0
+access_spsl_approval_rule_manager,spsl.approval.rule.manager,model_spsl_approval_rule,group_spsl_approval_manager,1,1,1,1
+access_spsl_approval_rule_line_user,spsl.approval.rule.line.user,model_spsl_approval_rule_line,spsl_core_group_user,1,0,0,0
+access_spsl_approval_rule_line_manager,spsl.approval.rule.line.manager,model_spsl_approval_rule_line,group_spsl_approval_manager,1,1,1,1
+access_spsl_audit_log_viewer,spsl.audit.log.viewer,model_spsl_audit_log,group_spsl_audit_viewer,1,0,0,0
+access_spsl_audit_log_manager,spsl.audit.log.manager,model_spsl_audit_log,spsl_core_group_manager,1,1,1,1
+access_spsl_audit_config_viewer,spsl.audit.config.viewer,model_spsl_audit_config,group_spsl_audit_viewer,1,0,0,0
+access_spsl_audit_config_manager,spsl.audit.config.manager,model_spsl_audit_config,spsl_core_group_manager,1,1,1,1
+access_spsl_notification_event_user,spsl.notification.event.user,model_spsl_notification_event,spsl_core_group_user,1,0,0,0
+access_spsl_notification_event_admin,spsl.notification.event.admin,model_spsl_notification_event,group_spsl_notification_admin,1,1,1,1
+access_spsl_notification_template_user,spsl.notification.template.user,model_spsl_notification_template,spsl_core_group_user,1,0,0,0
+access_spsl_notification_template_admin,spsl.notification.template.admin,model_spsl_notification_template,group_spsl_notification_admin,1,1,1,1
+access_spsl_notification_log_user,spsl.notification.log.user,model_spsl_notification_log,spsl_core_group_user,1,0,0,0
+access_spsl_notification_log_admin,spsl.notification.log.admin,model_spsl_notification_log,group_spsl_notification_admin,1,1,1,1
+access_spsl_commission_rule_user,spsl.commission.rule.user,model_spsl_commission_rule,spsl_core_group_user,1,0,0,0
+access_spsl_commission_rule_manager,spsl.commission.rule.manager,model_spsl_commission_rule,group_spsl_commission_manager,1,1,1,1
+access_spsl_commission_entry_user,spsl.commission.entry.user,model_spsl_commission_entry,spsl_core_group_user,1,0,0,0
+access_spsl_commission_entry_manager,spsl.commission.entry.manager,model_spsl_commission_entry,group_spsl_commission_manager,1,1,1,1
+access_spsl_commission_entry_line_user,spsl.commission.entry.line.user,model_spsl_commission_entry_line,spsl_core_group_user,1,0,0,0
+access_spsl_commission_entry_line_manager,spsl.commission.entry.line.manager,model_spsl_commission_entry_line,group_spsl_commission_manager,1,1,1,1
+access_spsl_commission_aggregation_user,spsl.commission.aggregation.user,model_spsl_commission_aggregation,spsl_core_group_user,1,0,0,0
+access_spsl_commission_aggregation_manager,spsl.commission.aggregation.manager,model_spsl_commission_aggregation,group_spsl_commission_manager,1,1,1,1

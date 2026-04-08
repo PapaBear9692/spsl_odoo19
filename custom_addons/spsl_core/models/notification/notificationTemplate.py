@@ -13,7 +13,7 @@ class NotificationTemplate(models.Model):
     code = fields.Char(
         string='Template Code',
         required=True,
-        unique=True,
+        # unique=True removed - not supported in Odoo 19
         index=True,
     )
     event_id = fields.Many2one(

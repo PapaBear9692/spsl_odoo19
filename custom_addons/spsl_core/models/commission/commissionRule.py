@@ -13,7 +13,7 @@ class CommissionRule(models.Model):
     code = fields.Char(
         string='Rule Code',
         required=True,
-        unique=True,
+        # unique=True removed - not supported in Odoo 19
         index=True,
     )
     sequence = fields.Integer(

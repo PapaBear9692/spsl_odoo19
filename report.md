@@ -1,6 +1,6 @@
 # SPSL Core Module - Development Report
 
-## Module Status: ✅ Installable (with workarounds)
+## Module Status: ✅ Installed & Running
 
 ---
 
@@ -8,232 +8,179 @@
 
 ### 1. Missing Model Files
 **Problem:** `__init__.py` files referenced models that didn't exist:
-- `approvalTransition.py`
-- `commissionEntry.py`
+- `approvalTransition.py` → Already defined in `approvalLevel.py` as `ApprovalTransition`
+- `commissionEntry.py` → Already defined in `commissionRule.py` as `CommissionEntry`
 
-**Solution:** Commented out imports in:
+**Solution:** Commented out duplicate imports in:
 - `custom_addons/spsl_core/models/approval/__init__.py`
 - `custom_addons/spsl_core/models/commission/__init__.py`
-
-```python
-# from . import approvalTransition  # TODO: Create this file
-# from . import commissionEntry  # TODO: Create this file
-```
 
 ---
 
 ### 2. Many2one ondelete Parameter
-**Problem:** `spsl.audit.config` model had Many2one to `ir.model` with unsupported `ondelete='restrict'`
+**Problem:** `spsl.audit.config` had Many2one to `ir.model` with unsupported `ondelete='restrict'`
 
-**Error:**
-```
-ValueError: Field model_id of model spsl.audit.config is defined as ondelete='restrict' while having ir.model as comodel, the 'restrict' mode is not supported for this type of field
-```
-
-**Solution:** Changed to `ondelete='cascade'` in:
-- `custom_addons/spsl_core/models/audit/auditConfig.py`
-
-```python
-model_id = fields.Many2one(
-    'ir.model',
-    string='Model',
-    required=True,
-    ondelete='cascade',  # Fixed
-)
-```
+**Solution:** Changed to `ondelete='cascade'` in `models/audit/auditConfig.py`
 
 ---
 
 ### 3. Deprecated Model Reference (account.period)
-**Problem:** `spsl.commission.aggregation` referenced `account.period` which was removed in Odoo 17+
+**Problem:** `spsl.commission.aggregation` referenced `account.period` (removed in Odoo 17+)
 
-**Error:**
-```
-AssertionError: Field spsl.commission.aggregation.period_id with unknown comodel_name 'account.period'
-```
-
-**Solution:** Replaced Many2one with Date fields in:
-- `custom_addons/spsl_core/models/commission/commissionAggregation.py`
-
-```python
-# Before:
-period_id = fields.Many2one('account.period', ...)
-
-# After:
-date_from = fields.Date(string='From Date', required=True, index=True)
-date_to = fields.Date(string='To Date', required=True, index=True)
-```
+**Solution:** Replaced with `date_from` and `date_to` Date fields in `models/commission/commissionAggregation.py`
 
 ---
 
-### 4. Unknown Field Parameter (unique)
+### 4. Unknown Field Parameter (unique) ✅ FIXED
 **Problem:** Fields using `unique=True` parameter which is not valid in Odoo 19
 
-**Warning:**
-```
-Field spsl.notification.event.code: unknown parameter 'unique'
-Field spsl.notification.template.code: unknown parameter 'unique'
-Field spsl.commission.rule.code: unknown parameter 'unique'
-```
+**Files affected:**
+- `models/notification/notificationEvent.py`
+- `models/notification/notificationTemplate.py`
+- `models/commission/commissionRule.py`
 
-**Solution:** Remove `unique` parameter or override `_valid_field_parameter` method. (Pending fix)
+**Solution:** Removed `unique=True` from all three files. Odoo 19 does not support the `unique` field parameter.
 
 ---
 
-### 5. res.groups category_id Field Removed
-**Problem:** In Odoo 19, `category_id` field was removed from `res.groups` model
+### 5. res.groups Fields Removed in Odoo 19
+**Problem:** `category_id` and `users` fields removed from `res.groups` model in Odoo 19
 
-**Error:**
-```
-ValueError: Invalid field 'category_id' in 'res.groups'
-```
-
-**Solution:** Simplified security XML in:
-- `custom_addons/spsl_core/security/spsl_core_security.xml`
-
-```xml
-<!-- Before: -->
-<record id="spsl_core_group_user" model="res.groups">
-    <field name="name">User</field>
-    <field name="category_id" ref="module_category_spsl"/>  <!-- REMOVED -->
-    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-</record>
-
-<!-- After: -->
-<record id="spsl_core_group_user" model="res.groups">
-    <field name="name">SPSL Core: User</field>
-    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-</record>
-```
+**Solution:** Removed both fields from security XML in `security/spsl_core_groups.xml`
 
 ---
 
 ### 6. operating_unit Module Incompatible
 **Problem:** OCA's `operating_unit` module has incompatible version with Odoo 19
 
+**Solution:** Commented out dependency in `__manifest__.py` and `models/mixins/branch_mixin.py`
+
+---
+
+### 7. employee_id References (hr.employee) ✅ COMMENTED OUT
+**Problem:** Models referenced `hr.employee` but `hr` module not installed
+
+**Files affected:**
+- `models/commission/commissionAggregation.py`
+- `models/commission/commissionRule.py`
+
+**Solution:** Commented out `employee_id` fields until `hr` module is installed
+
+---
+
+### 8. CommissionMixin commission_entry_id ✅ COMMENTED OUT
+**Problem:** `commissionMixin` referenced `spsl.commission.entry` via Many2one
+
+**Solution:** Commented out `commission_entry_id` field in `models/commission/commissionMixin.py`
+
+---
+
+### 9. Malformed ir.model.access.csv ✅ FIXED
+**Problem:** CSV file had `#` comments, line breaks, and missing columns (not allowed in Odoo CSV)
+
+**Solution:** Rewrote CSV with proper 8-column format: `id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink`
+
+---
+
+### 10. _sql_constraints Deprecation Warning
+**Problem:** `_sql_constraints` attribute no longer supported in Odoo 19
+
 **Warning:**
 ```
-WARNING SPSL odoo.modules.module: The module operating_unit has an incompatible version, setting installable=False
+Model attribute '_sql_constraints' is no longer supported, please define model.Constraint on the model.
 ```
 
-**Solution:** Commented out dependency and related code in:
-1. `custom_addons/spsl_core/__manifest__.py`
-2. `custom_addons/spsl_core/models/mixins/branch_mixin.py`
+**Solution:** Pending — needs migration to `model.Constraint` (Odoo 19 convention)
 
 ---
 
-### 7. Commission Aggregation employee_id (Commented out
-**Problem:** `spsl.commission.aggregation` referenced `hr.employee` model
+## Files Commented Out
 
-**Solution:** Commented out the `employee_id` field and:
-- `custom_addons/spsl_core/models/commission/commissionAggregation.py`
-
-```python
-_order = 'date_from desc'  # Removed employee_id from order
-
-```
-
----
-
-### 8. CommissionMixin commission_entry_id (Commented out
-**Problem:** `commissionMixin` referenced `spsl.commission.entry` model which doesn't exist
-
-**Solution:** Commented out the `commission_entry_id` field in:
-- `custom_addons/spsl_core/models/commission/commissionMixin.py`
+| File | What | Reason |
+|------|------|--------|
+| `__manifest__.py` | `"operating_unit"` dependency | OCA module incompatible with Odoo 19 |
+| `__manifest__.py` | `"views/test_views.xml"` | Test only |
+| `models/__init__.py` | `from . import test_model` | Test only |
+| `models/mixins/branch_mixin.py` | `operating_unit_id` field | `operating.unit` model missing |
+| `models/commission/commissionAggregation.py` | `employee_id` field | `hr.employee` model missing |
+| `models/commission/commissionRule.py` | `employee_id` field | `hr.employee` model missing |
+| `models/commission/commissionMixin.py` | `commission_entry_id` field | Self-referencing issue |
+| `models/approval/__init__.py` | `approvalTransition` import | Already in `approvalLevel.py` |
+| `models/commission/__init__.py` | `commissionEntry` import | Already in `commissionRule.py` |
 
 ---
 
-## Files Commented Out for Testing
+## Models Created
 
-**Files:**
-- `custom_addons/spsl_core/models/__init__.py`
-```python
-# from . import test_model  # TODO: Uncomment when testing mixins
-```
-- `custom_addons/spsl_core/__manifest__.py`
-```python
-# Test Views (remove in production)
-# "views/test_views.xml",
-`` ```
-
-- `custom_addons/spsl_core/models/__init__.py`
-```python
-# from . import mixins
-from . import test_model
-```
-
----
-
-### 9. CommissionEntry employee_id Commented out
-**Problem:** `CommissionEntry` model referenced `hr.employee` which doesn't exist
-
-**Solution:** Commented out the `employee_id` field in:
-- `custom_addons/spsl_core/models/commission/commissionRule.py`
-    - `custom_addons/spsl_core/models/commission/commissionAggregation.py`
+| Model | File | Type | Status |
+|-------|------|------|--------|
+| `spsl.mixin.approval` | `models/mixins/approval_mixin.py` | Abstract | ✅ |
+| `spsl.mixin.audit` | `models/mixins/audit_mixin.py` | Abstract | ✅ |
+| `spsl.mixin.branch` | `models/mixins/branch_mixin.py` | Abstract | ✅ (partial) |
+| `spsl.approval.request` | `models/approval/approvalRequest.py` | Model | ✅ |
+| `spsl.approval.level` | `models/approval/approvalLevel.py` | Model | ✅ |
+| `spsl.approval.transition` | `models/approval/approvalLevel.py` | Model | ✅ |
+| `spsl.approval.rule` | `models/approval/approval_rule.py` | Model | ✅ NEW |
+| `spsl.approval.rule.line` | `models/approval/approval_rule.py` | Model | ✅ NEW |
+| `spsl.audit.log` | `models/audit/auditLog.py` | Model | ✅ |
+| `spsl.audit.config` | `models/audit/auditConfig.py` | Model | ✅ |
+| `spsl.notification.event` | `models/notification/notificationEvent.py` | Model | ✅ |
+| `spsl.notification.template` | `models/notification/notificationTemplate.py` | Model | ✅ |
+| `spsl.notification.log` | `models/notification/notificationLog.py` | Model | ✅ |
+| `spsl.commission.rule` | `models/commission/commissionRule.py` | Model | ✅ |
+| `spsl.commission.entry` | `models/commission/commissionRule.py` | Model | ✅ |
+| `spsl.commission.entry.line` | `models/commission/commissionRule.py` | Model | ✅ |
+| `spsl.commission.aggregation` | `models/commission/commissionAggregation.py` | Model | ✅ (partial) |
 
 ---
 
-## How to Test Mixins later
+## Security Groups Created
 
-When ready to test the mixin functionality:
+| Group ID | Name | Implies |
+|----------|------|---------|
+| `spsl_core_group_user` | SPSL Core: User | `base.group_user` |
+| `spsl_core_group_manager` | SPSL Core: Manager | `spsl_core_group_user` |
+| `spsl_core_group_admin` | SPSL Core: Administrator | `spsl_core_group_manager` |
+| `group_spsl_approval_manager` | Approval Manager | `spsl_core_group_user` |
+| `group_spsl_audit_viewer` | Audit Viewer | `spsl_core_group_user` |
+| `group_spsl_notification_admin` | Notification Admin | `spsl_core_group_user` |
+| `group_spsl_commission_manager` | Commission Manager | `spsl_core_group_user` |
+| `group_hq_all_branches` | HQ All Branches | `spsl_core_group_manager` |
 
-### Step 1: Install operating_unit Module
+---
+
+## Remaining Tasks
+
+1. **Migrate `_sql_constraints`** to Odoo 19 `model.Constraint` format in `approval_rule.py`
+2. **Install OCA modules** when available for Odoo 19:
+   - `operating_unit` → enables branch mixin
+   - `hr` → enables employee fields
+3. **Uncomment commented fields** after installing dependencies
+4. **Add unit tests** in `tests/` directory
+5. **Create views** for approval rule configuration UI
+
+---
+
+## How to Test Later
+
+### Step 1: Install missing modules
 ```bash
-# Download OCA operating_unit module compatible with Odoo 19
-# Place in custom_addons folder
-git clone https://github.com/OCA/operating-unit.git -b 19.0
+# When OCA releases Odoo 19 compatible versions
+git clone https://github.com/OCA/operating-unit.git -b 19.0 custom_addons/operating_unit
 ```
 
-### Step 2: Uncomment Files
+### Step 2: Uncomment files
+- `__manifest__.py` → uncomment `"operating_unit"` and `"views/test_views.xml"`
+- `models/__init__.py` → uncomment `from . import test_model`
+- `models/mixins/branch_mixin.py` → uncomment `operating_unit_id` field
+- `models/commission/*.py` → uncomment `employee_id` fields
 
-**File:** `custom_addons/spsl_core/__manifest__.py`
-```python
-"depends": [
-    "base",
-    "mail",
-    "operating_unit",  # UNCOMMENT THIS
-],
-```
-
-**File:** `custom_addons/spsl_core/models/__init__.py`
-```python
-from . import test_model  # UNCOMMENT THIS
-```
-
-**File:** `custom_addons/spsl_core/__manifest__.py` (data section)
-```python
-"views/test_views.xml",  # UNCOMMENT THIS
-```
-
-**File:** `custom_addons/spsl_core/models/mixins/branch_mixin.py`
-```python
-# UNCOMMENT operating_unit_id field and related methods
-```
-
-### Step 3: Update Module
+### Step 3: Update module
 ```bash
-python odoo-bin -c odoo.conf -d S SLSL -u sp_sl_core
+python odoo-bin -c odoo.conf -d SPSL -u spsl_core
 ```
 
-### Step 4: Test in UI
-1. Go to **Settings → Technical → Test Approval** - Test ApprovalMixin
-2. Go to **Settings → Technical → Test Audit** - Test AuditMixin
-3. Go to **Settings → Technical → Test Branch** - Test BranchMixin
-
-4. Check `spsl.audit.log` model for audit entries
-
-5. Test via Shell
-```bash
-python odoo-bin -c odoo.conf -d SPSL --shell
-
-```
-
-### Remaining Tasks
-
-1. Fix `unique` parameter warnings - Override `_valid_field_parameter` or remove `unique=True`
-2. Create missing model files:
-   - `approvalTransition.py`
-   - `commissionEntry.py`
-3. Install OCA operating_unit module (when available for Odoo 19)
-4. Add unit tests in `tests/` directory
-5. Add missing access rules for CSV warning:
+### Step 4: Verify
+1. Settings → Technical → Test Approval
+2. Settings → Technical → Test Audit
+3. Settings → Technical → Test Branch
