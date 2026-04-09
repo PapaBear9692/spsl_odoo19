@@ -1,0 +1,39 @@
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: SPSL
+      POSTGRES_USER: odoo19
+      POSTGRES_PASSWORD: odoo19
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/var/lib/redis
+    restart: unless-stopped
+
+volumes:
+  odoo-db-data:
+  pgadmin-data:
+  redis-data:

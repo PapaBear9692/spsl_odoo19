@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="contract_tag_view_list" model="ir.ui.view">
+        <field name="name">contract.tag list view</field>
+        <field name="model">contract.tag</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="color" />
+                <field name="company_id" groups="base.group_multi_company" />
+            </list>
+        </field>
+    </record>
+    <record id="contract_tag_view_form" model="ir.ui.view">
+        <field name="name">contract.tag form view</field>
+        <field name="model">contract.tag</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" />
+                    <field name="color" />
+                    <field name="company_id" groups="base.group_multi_company" />
+                </group>
+            </form>
+        </field>
+    </record>
+</odoo>

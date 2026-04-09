@@ -1,0 +1,36 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+{
+    "name": "Recurring - Contracts Management",
+    "version": "19.0.1.0.0",
+    "category": "Contract Management",
+    "license": "AGPL-3",
+    "author": "Smart Printing Service Limited",
+    "website": "",
+    "depends": ["base", "account", "product", "portal"],
+    "development_status": "Production/Stable",
+    "data": [
+        "security/contract_tag.xml",
+        "security/ir.model.access.csv",
+        "security/contract_security.xml",
+        "report/report_contract.xml",
+        "report/contract_views.xml",
+        "data/contract_cron.xml",
+        "data/mail_template.xml",
+        "data/template_mail_notification.xml",
+        "data/mail_message_subtype.xml",
+        "data/ir_ui_menu.xml",
+        "wizards/contract_manually_create_invoice.xml",
+        "views/contract_tag.xml",
+        "views/contract_template_line.xml",
+        "views/contract_template.xml",
+        "views/contract.xml",
+        "views/contract_line.xml",
+        "views/res_partner_view.xml",
+        "views/contract_portal_templates.xml",
+    ],
+    "assets": {
+        "web.assets_frontend": ["contract_19/static/src/scss/frontend.scss"],
+    },
+    "installable": True,
+}

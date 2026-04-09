@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <report
+        id="report_contract"
+        model="contract.contract"
+        string="Contract Report"
+        report_type="qweb-pdf"
+        name="contract_19.report_contract_template"
+        file="contract_19.report_contract_template"
+    />
+</odoo>

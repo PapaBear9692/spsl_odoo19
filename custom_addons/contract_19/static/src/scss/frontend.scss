@@ -1,0 +1,17 @@
+.o_portal_my_contracts {
+    table {
+        th, td {
+            vertical-align: middle;
+        }
+    }
+}
+
+.contract_tbody {
+    tr.o_line_section {
+        font-weight: bold;
+        background-color: #eee;
+    }
+    tr.o_line_note {
+        font-style: italic;
+    }
+}
