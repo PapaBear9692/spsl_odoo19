@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    <!-- Audit Log List View (Tree) -->
+    <!-- Color-coded: create=green, write=blue, unlink=red -->
+    <!-- ============================================================ -->
+    <record id="view_spsl_audit_log_list" model="ir.ui.view">
+        <field name="name">spsl.audit.log.list</field>
+        <field name="model">spsl.audit.log</field>
+        <field name="arch" type="xml">
+            <list string="Audit Log" default_order="timestamp desc">
+                <field name="timestamp"/>
+                <field name="user_id"/>
+                <field name="model_name"/>
+                <field name="record_name"/>
+                <field name="action"/>
+                <field name="hash_truncated" string="Hash"/>
+                <field name="audit_category"/>
+                <field name="chain_verified" string="Verified"/>
+                <field name="archived"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Audit Log Form View -->
+    <!-- Full details with JSON display -->
+    <!-- ============================================================ -->
+    <record id="view_spsl_audit_log_form" model="ir.ui.view">
+        <field name="name">spsl.audit.log.form</field>
+        <field name="model">spsl.audit.log</field>
+        <field name="arch" type="xml">
+            <form string="Audit Log" create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_verify_integrity"
+                            type="object"
+                            string="Verify Integrity"
+                            class="btn-primary"/>
+
+                    <button name="action_verify_chain"
+                            type="object"
+                            string="Verify Chain"
+                            class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <!-- Chain Status Indicator -->
+                    <div name="chain_status_box" col="2">
+                        <div name="verified_status" invisible="not chain_verified">
+                            <b>✓ Chain Integrity: Verified</b>
+                        </div>
+                        <div name="unverified_status" invisible="chain_verified">
+                            <b>⚠️ Chain Integrity: Unverified</b>
+                        </div>
+                    </div>
+                    
+                    <group string="Basic Information">
+                        <field name="name"/>
+                        <field name="timestamp"/>
+                        <field name="user_id"/>
+                        <field name="ip_address"/>
+                    </group>
+                    
+                    <group string="Record Information">
+                        <field name="model_name"/>
+                        <field name="record_id"/>
+                        <field name="record_name"/>
+                        <field name="action"/>
+                        <field name="audit_category"/>
+                    </group>
+                    
+                    <group string="Hash Chain">
+                        <field name="hash"/>
+                        <field name="previous_hash"/>
+                        <field name="chain_verified" string="Verified"/>
+                    </group>
+                    
+                    <group string="Field Changes">
+                        <field name="field_changes"/>
+                    </group>
+                    
+                    <group string="Old Values (Before Change)">
+                        <field name="old_values"/>
+                    </group>
+                    
+                    <group string="New Values (After Change)">
+                        <field name="new_values"/>
+                    </group>
+                    
+                    <group string="Archive Status">
+                        <field name="archived"/>
+                        <field name="archived_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Audit Log Search View -->
+    <!-- ============================================================ -->
+    <record id="view_spsl_audit_log_search" model="ir.ui.view">
+        <field name="name">spsl.audit.log.search</field>
+        <field name="model">spsl.audit.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Audit Log">
+                <field name="name"/>
+                <field name="model_name"/>
+                <field name="record_name"/>
+                <field name="user_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action: Audit Log -->
+    <!-- ============================================================ -->
+    <record id="action_spsl_audit_log" model="ir.actions.act_window">
+        <field name="name">Audit Log</field>
+        <field name="res_model">spsl.audit.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action: Verify Chain Integrity (Server Action) -->
+    <!-- ============================================================ -->
+    <record id="action_verify_chain_integrity" model="ir.actions.server">
+        <field name="name">Verify Chain Integrity</field>
+        <field name="model_id" ref="model_spsl_audit_log"/>
+        <field name="state">code</field>
+        <field name="code">
+result = model.verify_chain_integrity()
+if result.get('broken'):
+    message = f"Chain Integrity FAILED: {len(result.get('broken', []))} broken record(s)"
+else:
+    message = f"Chain Integrity VERIFIED: {result['total_checked']} records checked, all valid"
+{
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'title': 'Chain Integrity Check',
+        'message': message,
+        'type': 'success' if not result.get('broken') else 'danger',
+        'sticky': True,
+    }
+}
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Menu: Audit Trail (Parent) -->
+    <!-- ============================================================ -->
+    <menuitem id="menu_spsl_audit_trail"
+              name="Audit Trail"
+              parent="menu_spsl_core_root"
+              groups="spsl_core.group_spsl_audit_viewer"
+              sequence="50"/>
+
+    <!-- ============================================================ -->
+    <!-- Menu Item: Audit Log -->
+    <!-- ============================================================ -->
+    <menuitem id="menu_spsl_audit_log"
+              name="Audit Log"
+              parent="menu_spsl_audit_trail"
+              action="action_spsl_audit_log"
+              groups="spsl_core.group_spsl_audit_viewer"
+              sequence="10"/>
+
+    <!-- ============================================================ -->
+    <!-- Menu Item: Verify Chain Integrity -->
+    <!-- ============================================================ -->
+    <menuitem id="menu_spsl_verify_chain"
+              name="Verify Chain Integrity"
+              parent="menu_spsl_audit_trail"
+              action="action_verify_chain_integrity"
+              groups="spsl_core.group_spsl_audit_viewer"
+              sequence="20"/>
+
+    <!-- ============================================================ -->
+    <!-- Audit Log Archive List View -->
+    <!-- ============================================================ -->
+    <record id="view_spsl_audit_log_archive_list" model="ir.ui.view">
+        <field name="name">spsl.audit.log.archive.list</field>
+        <field name="model">spsl.audit.log.archive</field>
+        <field name="arch" type="xml">
+            <list string="Audit Log Archive" default_order="timestamp desc">
+                <field name="name"/>
+                <field name="model_name"/>
+                <field name="record_id"/>
+                <field name="action"/>
+                <field name="user_id"/>
+                <field name="timestamp"/>
+                <field name="archived_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action: Audit Log Archive -->
+    <!-- ============================================================ -->
+    <record id="action_spsl_audit_log_archive" model="ir.actions.act_window">
+        <field name="name">Audit Log Archive</field>
+        <field name="res_model">spsl.audit.log.archive</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Menu Item: Audit Log Archive -->
+    <!-- ============================================================ -->
+    <menuitem id="menu_spsl_audit_log_archive"
+              name="Audit Log Archive"
+              parent="menu_spsl_audit_trail"
+              action="action_spsl_audit_log_archive"
+              groups="spsl_core.group_spsl_audit_viewer"
+              sequence="15"/>
+</odoo>

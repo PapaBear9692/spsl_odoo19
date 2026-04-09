@@ -68,15 +68,18 @@ class ApprovalRule(models.Model):
 
     @api.constrains('model_name', 'field_trigger')
     def _check_field_trigger_exists(self):
-        """Validate that field_trigger exists on the target model."""
+        """Validate that field_trigger exists on the target model.
+
+        Skips validation if the target model is not loaded (e.g. the
+        corresponding module is not yet installed). This allows seed
+        data to define rules for models that will become available later.
+        """
         for record in self:
             if not record.field_trigger:
                 continue
             if record.model_name not in self.env:
-                raise ValidationError(_(
-                    'Model "%(model_name)s" does not exist in the system.',
-                    model_name=record.model_name,
-                ))
+                # Model not loaded — skip until the module is installed
+                continue
             target_model = self.env[record.model_name]
             if record.field_trigger not in target_model._fields:
                 raise ValidationError(_(

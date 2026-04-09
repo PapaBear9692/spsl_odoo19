@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- ============================================================ -->
+        <!-- AT-001: Financial Transactions -->
+        <!-- Models: account.move, account.payment, account.bank.statement.line -->
+        <!-- ============================================================ -->
+        <record id="audit_config_at001" model="spsl.audit.config">
+            <field name="category">AT-001</field>
+            <field name="audit_enabled" eval="True"/>
+            <field name="retention_years">7</field>
+            <field name="track_create" eval="True"/>
+            <field name="track_write" eval="True"/>
+            <field name="track_delete" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+        
+        <!-- ============================================================ -->
+        <!-- AT-002: Contract Changes -->
+        <!-- Models: spsl.mps.contract (future), sale.order -->
+        <!-- ============================================================ -->
+        <record id="audit_config_at002" model="spsl.audit.config">
+            <field name="category">AT-002</field>
+            <field name="audit_enabled" eval="True"/>
+            <field name="retention_years">7</field>
+            <field name="track_create" eval="True"/>
+            <field name="track_write" eval="True"/>
+            <field name="track_delete" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+        
+        <!-- ============================================================ -->
+        <!-- AT-003: HR Master Data -->
+        <!-- Models: hr.employee, hr.contract, hr.payslip -->
+        <!-- ============================================================ -->
+        <record id="audit_config_at003" model="spsl.audit.config">
+            <field name="category">AT-003</field>
+            <field name="audit_enabled" eval="True"/>
+            <field name="retention_years">7</field>
+            <field name="track_create" eval="True"/>
+            <field name="track_write" eval="True"/>
+            <field name="track_delete" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+        
+        <!-- ============================================================ -->
+        <!-- AT-004: System Configuration -->
+        <!-- Models: res.config.settings, ir.rule, res.groups -->
+        <!-- ============================================================ -->
+        <record id="audit_config_at004" model="spsl.audit.config">
+            <field name="category">AT-004</field>
+            <field name="audit_enabled" eval="True"/>
+            <field name="retention_years">7</field>
+            <field name="track_create" eval="True"/>
+            <field name="track_write" eval="True"/>
+            <field name="track_delete" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+        
+        <!-- ============================================================ -->
+        <!-- AT-005: Master Data -->
+        <!-- Models: res.partner, product.template, product.product -->
+        <!-- ============================================================ -->
+        <record id="audit_config_at005" model="spsl.audit.config">
+            <field name="category">AT-005</field>
+            <field name="audit_enabled" eval="True"/>
+            <field name="retention_years">7</field>
+            <field name="track_create" eval="True"/>
+            <field name="track_write" eval="True"/>
+            <field name="track_delete" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

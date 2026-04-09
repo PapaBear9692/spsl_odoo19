@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    <!-- ============================================================ -->
+    # BRD_12: Standard Approval Rule Templates (noupdate)
+    # These are seed templates. After installing Purchase, Sale,
+    # and Accounting modules, the model_name fields will resolve
+    # to the correct models.
+    <!-- ============================================================ -->
+
+    <!-- ============================================================ -->
+    # 1. Sales Discount Approval
+    #    Trigger: discount_percentage
+    #    Tiers:   ≤5% Branch Manager | 5-15% Sales Director | >15% CFO
+    <!-- ============================================================ -->
+    <record id="approval_rule_sales_discount" model="spsl.approval.rule">
+        <field name="name">Sales Discount Approval</field>
+        <field name="model_name">sale.order</field>
+        <field name="field_trigger">discount_percentage</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="approval_rule_sales_discount_tier1" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_sales_discount"/>
+        <field name="sequence">10</field>
+        <field name="amount_from">0</field>
+        <field name="amount_to">5</field>
+        <field name="approver_group_id" ref="group_spsl_branch_manager"/>
+        <field name="require_all" eval="False"/>
+    </record>
+
+    <record id="approval_rule_sales_discount_tier2" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_sales_discount"/>
+        <field name="sequence">20</field>
+        <field name="amount_from">5</field>
+        <field name="amount_to">15</field>
+        <field name="approver_group_id" ref="group_spsl_sales_director"/>
+        <field name="require_all" eval="False"/>
+    </record>
+
+    <record id="approval_rule_sales_discount_tier3" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_sales_discount"/>
+        <field name="sequence">30</field>
+        <field name="amount_from">15</field>
+        <field name="amount_to">0</field>
+        <field name="approver_group_id" ref="group_spsl_cfo"/>
+        <field name="require_all" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    # 2. Purchase Order Approval
+    #    Trigger: amount_total
+    #    Tiers:   ≤50K Branch Manager | 50K-500K Ops Manager |
+    #             500K-5M CFO | >5M MD
+    <!-- ============================================================ -->
+    <record id="approval_rule_purchase_order" model="spsl.approval.rule">
+        <field name="name">Purchase Order Approval</field>
+        <field name="model_name">purchase.order</field>
+        <field name="field_trigger">amount_total</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="approval_rule_purchase_order_tier1" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_purchase_order"/>
+        <field name="sequence">10</field>
+        <field name="amount_from">0</field>
+        <field name="amount_to">50000</field>
+        <field name="approver_group_id" ref="group_spsl_branch_manager"/>
+        <field name="require_all" eval="False"/>
+    </record>
+
+    <record id="approval_rule_purchase_order_tier2" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_purchase_order"/>
+        <field name="sequence">20</field>
+        <field name="amount_from">50000</field>
+        <field name="amount_to">500000</field>
+        <field name="approver_group_id" ref="group_spsl_operations_manager"/>
+        <field name="require_all" eval="False"/>
+    </record>
+
+    <record id="approval_rule_purchase_order_tier3" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_purchase_order"/>
+        <field name="sequence">30</field>
+        <field name="amount_from">500000</field>
+        <field name="amount_to">5000000</field>
+        <field name="approver_group_id" ref="group_spsl_cfo"/>
+        <field name="require_all" eval="True"/>
+    </record>
+
+    <record id="approval_rule_purchase_order_tier4" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_purchase_order"/>
+        <field name="sequence">40</field>
+        <field name="amount_from">5000000</field>
+        <field name="amount_to">0</field>
+        <field name="approver_group_id" ref="group_spsl_md"/>
+        <field name="require_all" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    # 3. Manual Journal Entry Approval
+    #    Trigger: amount_total
+    #    Tiers:   any amount Finance Manager | >500K CFO
+    <!-- ============================================================ -->
+    <record id="approval_rule_journal_entry" model="spsl.approval.rule">
+        <field name="name">Manual Journal Entry Approval</field>
+        <field name="model_name">account.move</field>
+        <field name="field_trigger">amount_total</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="approval_rule_journal_entry_tier1" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_journal_entry"/>
+        <field name="sequence">10</field>
+        <field name="amount_from">0</field>
+        <field name="amount_to">500000</field>
+        <field name="approver_group_id" ref="group_spsl_finance_manager"/>
+        <field name="require_all" eval="False"/>
+    </record>
+
+    <record id="approval_rule_journal_entry_tier2" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_journal_entry"/>
+        <field name="sequence">20</field>
+        <field name="amount_from">500000</field>
+        <field name="amount_to">0</field>
+        <field name="approver_group_id" ref="group_spsl_cfo"/>
+        <field name="require_all" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    # 4. Credit Note Approval
+    #    Trigger: amount_total
+    #    Tiers:   ≤100K Finance Manager | >100K CFO
+    <!-- ============================================================ -->
+    <record id="approval_rule_credit_note" model="spsl.approval.rule">
+        <field name="name">Credit Note Approval</field>
+        <field name="model_name">account.move</field>
+        <field name="field_trigger">amount_total</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="approval_rule_credit_note_tier1" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_credit_note"/>
+        <field name="sequence">10</field>
+        <field name="amount_from">0</field>
+        <field name="amount_to">100000</field>
+        <field name="approver_group_id" ref="group_spsl_finance_manager"/>
+        <field name="require_all" eval="False"/>
+    </record>
+
+    <record id="approval_rule_credit_note_tier2" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="approval_rule_credit_note"/>
+        <field name="sequence">20</field>
+        <field name="amount_from">100000</field>
+        <field name="amount_to">0</field>
+        <field name="approver_group_id" ref="group_spsl_cfo"/>
+        <field name="require_all" eval="True"/>
+    </record>
+    </data>
+</odoo>

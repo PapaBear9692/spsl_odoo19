@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================= -->
+    <!-- Notification Channel List -->
+    <!-- ============================= -->
+    <record id="view_spsl_notification_channel_list" model="ir.ui.view">
+        <field name="name">spsl.notification.channel.list</field>
+        <field name="model">spsl.notification.channel</field>
+        <field name="arch" type="xml">
+            <list string="Notification Channels">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_spsl_notification_channel_form" model="ir.ui.view">
+        <field name="name">spsl.notification.channel.form</field>
+        <field name="model">spsl.notification.channel</field>
+        <field name="arch" type="xml">
+            <form string="Notification Channel">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="active"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_spsl_notification_channel" model="ir.actions.act_window">
+        <field name="name">Notification Channels</field>
+        <field name="res_model">spsl.notification.channel</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============================= -->
+    <!-- Notification Template List -->
+    <!-- ============================= -->
+    <record id="view_spsl_notification_template_list" model="ir.ui.view">
+        <field name="name">spsl.notification.template.list</field>
+        <field name="model">spsl.notification.template</field>
+        <field name="arch" type="xml">
+            <list string="Notification Templates" default_order="event_code">
+                <field name="event_code"/>
+                <field name="name"/>
+                <field name="recipient_type"/>
+                <field name="is_mandatory"/>
+                <field name="escalation_delay_hours"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================= -->
+    <!-- Notification Template Form -->
+    <!-- ============================= -->
+    <record id="view_spsl_notification_template_form" model="ir.ui.view">
+        <field name="name">spsl.notification.template.form</field>
+        <field name="model">spsl.notification.template</field>
+        <field name="arch" type="xml">
+            <form string="Notification Template">
+                <sheet>
+                    <group string="Basic Information">
+                        <field name="event_code"/>
+                        <field name="name"/>
+                        <field name="description"/>
+                        <field name="active"/>
+                        <field name="is_mandatory"/>
+                    </group>
+
+                    <group string="Channels">
+                        <field name="channels" widget="many2many_tags"/>
+                    </group>
+
+                    <group string="Recipients">
+                        <field name="recipient_type"/>
+                        <field name="recipient_group_id"
+                                invisible="recipient_type != 'role_group'"/>
+                        <field name="recipient_user_ids"
+                                invisible="recipient_type not in ['specific_user', 'custom']"/>
+                        <field name="model_ids" widget="many2many_tags"/>
+                    </group>
+
+                    <group string="Templates">
+                        <field name="subject_template"/>
+                        <field name="body_template"/>
+                    </group>
+
+                    <group string="Escalation">
+                        <field name="escalation_delay_hours"/>
+                        <field name="escalation_template_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================= -->
+    <!-- Search -->
+    <!-- ============================= -->
+    <record id="view_spsl_notification_template_search" model="ir.ui.view">
+        <field name="name">spsl.notification.template.search</field>
+        <field name="model">spsl.notification.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="event_code"/>
+                <field name="name"/>
+                <field name="recipient_type"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================= -->
+    <!-- Action -->
+    <!-- ============================= -->
+    <record id="action_spsl_notification_template" model="ir.actions.act_window">
+        <field name="name">Notification Templates</field>
+        <field name="res_model">spsl.notification.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============================= -->
+    <!-- Menu -->
+    <!-- ============================= -->
+    <menuitem id="menu_spsl_notification_root"
+              name="Notifications"
+              parent="menu_spsl_core_root"
+              sequence="60"/>
+
+    <menuitem id="menu_spsl_notification_template"
+              name="Templates"
+              parent="menu_spsl_notification_root"
+              action="action_spsl_notification_template"
+              sequence="10"/>
+
+    <menuitem id="menu_spsl_notification_channel"
+              name="Channels"
+              parent="menu_spsl_notification_root"
+              action="action_spsl_notification_channel"
+              sequence="20"/>
+
+</odoo>

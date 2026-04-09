@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Audit Configuration List View -->
+    <record id="view_spsl_audit_config_list" model="ir.ui.view">
+        <field name="name">spsl.audit.config.list</field>
+        <field name="model">spsl.audit.config</field>
+        <field name="arch" type="xml">
+            <list string="Audit Configuration">
+                <field name="category"/>
+                <field name="name"/>
+                <field name="audit_enabled"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Audit Configuration Form View -->
+    <record id="view_spsl_audit_config_form" model="ir.ui.view">
+        <field name="name">spsl.audit.config.form</field>
+        <field name="model">spsl.audit.config</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="category"/>
+                <field name="name"/>
+                <field name="audit_enabled"/>
+                <field name="active"/>
+                <field name="retention_years"/>
+                <field name="track_create"/>
+                <field name="track_write"/>
+                <field name="track_delete"/>
+                <field name="model_ids"/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_spsl_audit_config" model="ir.actions.act_window">
+        <field name="name">Audit Configuration</field>
+        <field name="res_model">spsl.audit.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_spsl_audit_config"
+              name="Audit Configuration"
+              action="action_spsl_audit_config"
+              sequence="100"/>
+</odoo>

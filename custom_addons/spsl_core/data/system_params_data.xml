@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- System Parameters -->
+        <record id="param_audit_retention_years" model="ir.config_parameter">
+            <field name="key">spsl.audit.retention_years</field>
+            <field name="value">7</field>
+        </record>
+    </data>
+</odoo>

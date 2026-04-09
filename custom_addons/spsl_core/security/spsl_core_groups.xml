@@ -55,4 +55,50 @@
         <field name="comment">HQ override for multi-branch access</field>
         <field name="implied_ids" eval="[(4, ref('spsl_core_group_manager'))]"/>
     </record>
+
+    <!-- ============================================================ -->
+    <!-- Approver Role Groups (used by approval rule tiers — BRD_12) -->
+    <!-- ============================================================ -->
+
+    <!-- Branch Manager -->
+    <record id="group_spsl_branch_manager" model="res.groups">
+        <field name="name">Branch Manager</field>
+        <field name="comment">Branch-level approver for standard operations</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_manager'))]"/>
+    </record>
+
+    <!-- Sales Director -->
+    <record id="group_spsl_sales_director" model="res.groups">
+        <field name="name">Sales Director</field>
+        <field name="comment">Approves high-value sales and discount overrides</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_manager'))]"/>
+    </record>
+
+    <!-- Operations Manager -->
+    <record id="group_spsl_operations_manager" model="res.groups">
+        <field name="name">Operations Manager</field>
+        <field name="comment">Approves mid-range purchase orders</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_manager'))]"/>
+    </record>
+
+    <!-- Finance Manager -->
+    <record id="group_spsl_finance_manager" model="res.groups">
+        <field name="name">Finance Manager</field>
+        <field name="comment">Approves journal entries and credit notes</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_manager'))]"/>
+    </record>
+
+    <!-- CFO (Chief Financial Officer) -->
+    <record id="group_spsl_cfo" model="res.groups">
+        <field name="name">CFO</field>
+        <field name="comment">Chief Financial Officer — approves high-value transactions</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_admin'))]"/>
+    </record>
+
+    <!-- MD (Managing Director) -->
+    <record id="group_spsl_md" model="res.groups">
+        <field name="name">MD</field>
+        <field name="comment">Managing Director — final approval authority</field>
+        <field name="implied_ids" eval="[(4, ref('spsl_core_group_admin'))]"/>
+    </record>
 </odoo>

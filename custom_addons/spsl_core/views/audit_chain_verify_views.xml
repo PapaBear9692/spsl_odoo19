@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    <!-- Wizard Form View: Audit Chain Verification Result -->
+    <!-- ============================================================ -->
+    <record id="view_spsl_audit_chain_verify_wizard_form" model="ir.ui.view">
+        <field name="name">spsl.audit.chain.verify.wizard.form</field>
+        <field name="model">spsl.audit.chain.verify.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Audit Chain Verification Result">
+                <sheet>
+                    <!-- Success Message -->
+                    <div name="success_message" invisible="not is_valid">
+                        <h2 style="color: green;">✓ Chain Integrity Verified</h2>
+                        <p>The audit log hash chain is intact. No tampering detected.</p>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div name="error_message" invisible="is_valid">
+                        <h2 style="color: red;">⚠️ Chain Integrity Compromised</h2>
+                        <p>Broken hash links detected in the audit trail.</p>
+                    </div>
+                    
+                    <group string="Verification Summary">
+                        <field name="total_checked" string="Total Records Checked"/>
+                        <field name="valid_count" string="Valid Hashes"/>
+                        <field name="broken_count" string="Broken Links"/>
+                        <field name="first_broken_timestamp" string="First Broken Link"/>
+                    </group>
+                    
+                    <group string="Broken Records Details" invisible="is_valid">
+                        <field name="broken_details" widget="ace" options="{'mode': 'json'}" readonly="1"/>
+                    </group>
+                    
+                    <footer>
+                        <button name="action_close" string="Close" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Server Action: Verify Audit Chain -->
+    <!-- ============================================================ -->
+    <record id="action_verify_audit_chain" model="ir.actions.server">
+        <field name="name">Verify Audit Chain</field>
+        <field name="model_id" ref="model_spsl_audit_log"/>
+        <field name="state">code</field>
+        <field name="code">
+# Verify the audit chain integrity
+result = model.verify_chain_integrity(batch_size=1000)
+
+# Prepare wizard values
+total_checked = result.get('total_checked', 0)
+valid_count = result.get('valid', 0)
+broken_records = result.get('broken', [])
+broken_count = len(broken_records)
+
+# Get first broken link timestamp
+first_broken_timestamp = False
+if broken_records:
+    first_record = model.browse(broken_records[0]['id'])
+    if first_record:
+        first_broken_timestamp = first_record.timestamp
+
+# Create wizard to display results
+wizard = env['spsl.audit.chain.verify.wizard'].create({
+    'total_checked': total_checked,
+    'valid_count': valid_count,
+    'broken_count': broken_count,
+    'first_broken_timestamp': first_broken_timestamp or False,
+    'broken_details': str(broken_records[:10]) if broken_records else '',
+})
+
+# Log notification if broken links found
+if broken_count > 0:
+    # Get CFO and System Administrator group
+    cfo_group = env.ref('spsl_core.group_spsl_cfo', False)
+    admin_group = env.ref('spsl_core.spsl_core_group_admin', False)
+    
+    # Create system notification (NE-052)
+    notification_msg = f"ALERT: Audit chain integrity check failed. {broken_count} broken record(s) detected out of {total_checked} total records. First broken link: {first_broken_timestamp}"
+    
+    # Post to mail.channel or log as activity
+    if cfo_group and cfo_group.users:
+        for user in cfo_group.users:
+            user.notify_warning(message=notification_msg)
+    if admin_group and admin_group.users:
+        for user in admin_group.users:
+            user.notify_warning(message=notification_msg)
+
+# Return wizard action
+{
+    'name': 'Audit Chain Verification Result',
+    'type': 'ir.actions.act_window',
+    'res_model': 'spsl.audit.chain.verify.wizard',
+    'res_id': wizard.id,
+    'view_mode': 'form',
+    'target': 'new',
+}
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Menu Item: Verify Audit Chain -->
+    <!-- ============================================================ -->
+    <menuitem id="menu_spsl_verify_audit_chain"
+              name="Verify Audit Chain"
+              parent="menu_spsl_audit_trail"
+              action="action_verify_audit_chain"
+              groups="spsl_core.group_spsl_audit_viewer"
+              sequence="25"/>
+</odoo>

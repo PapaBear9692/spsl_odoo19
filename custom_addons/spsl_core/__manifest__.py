@@ -18,11 +18,23 @@
         # Security
         "security/spsl_core_groups.xml",
         "security/ir.model.access.csv",
+        "security/approval_rules.xml",
+        "security/audit_rules.xml",
         # Data
         "data/sequence_data.xml",
         "data/mail_template_data.xml",
+        "data/approval_rules_data.xml",
+        "data/cron_data.xml",
+        "data/audit_config_data.xml",
+        "data/system_params_data.xml",
+        "data/notification_channel_data.xml",
         # Views
         "views/approval_views.xml",
+        "views/approval_queue_views.xml",
+        "views/audit_config_views.xml",
+        "views/audit_log_views.xml",
+        "views/audit_chain_verify_views.xml",
+        "views/notification_template_views.xml",
         # Test Views (remove in production)
         # "views/test_views.xml",
     ],

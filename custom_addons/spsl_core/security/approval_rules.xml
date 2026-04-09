@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    # Record Rules — spsl.approval.request visibility
+    <!-- ============================================================ -->
+    # A user can see an approval request if they are:
+    #   1. The requester (requested_by = user)
+    #   2. The designated specific approver (rule_line_id.approver_user_id = user)
+    #   3. A member of the designated approver group
+    #   4. The deputy assigned to the request (deputy_approver_id = user)
+    #   5. A member of the Approval Manager group (full visibility)
+    <!-- ============================================================ -->
+
+    <!-- Approval Manager: see all requests (no restriction) -->
+    <record id="approval_request_rule_manager" model="ir.rule">
+        <field name="name">Approval Request: manager sees all</field>
+        <field name="model_id" ref="model_spsl_approval_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('spsl_core.group_spsl_approval_manager'))]"/>
+    </record>
+
+    <!-- Regular user: see own requests, assigned requests, or as deputy -->
+    <record id="approval_request_rule_user" model="ir.rule">
+        <field name="name">Approval Request: user sees own/assigned</field>
+        <field name="model_id" ref="model_spsl_approval_request"/>
+        <field name="domain_force">[
+            '|', '|',
+            ('requested_by', '=', user.id),
+            ('approver_user_ids', 'in', [user.id]),
+            ('deputy_approver_id', '=', user.id),
+        ]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- ============================================================ -->
+    # Record Rules — spsl.approval.deputy visibility
+    <!-- ============================================================ -->
+    # Deputy records are visible to the absent approver (user_id),
+    # the deputy themselves, and Approval Managers.
+    <!-- ============================================================ -->
+
+    <!-- Approval Manager: see all deputy records -->
+    <record id="approval_deputy_rule_manager" model="ir.rule">
+        <field name="name">Approval Deputy: manager sees all</field>
+        <field name="model_id" ref="model_spsl_approval_deputy"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('spsl_core.group_spsl_approval_manager'))]"/>
+    </record>
+
+    <!-- Regular user: see deputies where they are the approver or the deputy -->
+    <record id="approval_deputy_rule_user" model="ir.rule">
+        <field name="name">Approval Deputy: user sees own assignments</field>
+        <field name="model_id" ref="model_spsl_approval_deputy"/>
+        <field name="domain_force">[
+            '|',
+            ('user_id', '=', user.id),
+            ('deputy_user_id', '=', user.id),
+        ]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>

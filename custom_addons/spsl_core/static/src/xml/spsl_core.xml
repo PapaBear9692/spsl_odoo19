@@ -1,43 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright 2026 SPSL - Smart Printing Service Limited
-    License OPL-1
+    License LGPL-3
 
     SPSL Core QWeb Templates
 -->
 <templates xml:space="preserve">
-    <!-- Approval Status Badges -->
-    <t t-name="spsl_core.approval_badge">
-        <span t-attf-class="spsl-approval-badge spsl-approval-#{state}">
-            <t t-if="state === 'draft'">Draft</t>
-            <t t-elif="state === 'pending'">Pending Approval</t>
-            <t t-elif="state === 'approved'">Approved</t>
-            <t t-elif="state === 'rejected'">Rejected</t>
-        </span>
-    </t>
 
-    <!-- Notification Indicator -->
-    <t t-name="spsl_core.notification_badge">
-        <span t-attf-class="spsl-notification-badge #{has_unread ? 'spsl-notification-unread' : ''}">
-            <span class="spsl-notification-icon">🔔</span>
-            <t t-if="count">
-                <span class="spsl-notification-count"><t t-esc="count"/></span>
+    <!-- ApprovalStatusBadge — field widget -->
+    <t t-name="spsl_core.ApprovalStatusBadge">
+        <div class="spsl-approval-badge-widget">
+            <span t-attf-class="spsl-badge {{badgeClass}}">
+                <t t-esc="stateLabel"/>
+            </span>
+            <t t-if="showMeta">
+                <div class="spsl-approval-meta">
+                    <span class="spsl-meta-user" t-esc="metaUser"/>
+                    <span t-if="metaDate" class="spsl-meta-sep"> — </span>
+                    <span class="spsl-meta-date" t-esc="metaDate"/>
+                </div>
             </t>
-        </span>
-    </t>
-
-    <!-- Approval Status Card -->
-    <t t-name="spsl_core.approval_status_card">
-        <div class="spsl-approval-status-card">
-            <div class="spsl-approval-header">
-                <span class="spsl-approval-title">Approval Status</span>
-            </div>
-            <div class="spsl-approval-body">
-                <t t-call="spsl_core.approval_badge"/>
-                <t t-if="request_id">
-                    <span class="spsl-approval-request">Request: <t t-esc="request_id"/></span>
-                </t>
-            </div>
         </div>
     </t>
+
 </templates>

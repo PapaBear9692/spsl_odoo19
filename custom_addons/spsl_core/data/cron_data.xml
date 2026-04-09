@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Auto-escalation of overdue approval requests (every 4 hours) -->
+        <record id="cron_approval_escalation" model="ir.cron">
+            <field name="name">SPSL: Escalate Overdue Approval Requests</field>
+            <field name="model_id" ref="model_spsl_approval_request"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">4</field>
+            <field name="interval_type">hours</field>
+            <field name="state">code</field>
+            <field name="code">model._cron_escalate_overdue_approvals()</field>
+            <field name="priority">10</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Approval reminder notifications (every 6 hours) -->
+        <record id="cron_approval_reminder" model="ir.cron">
+            <field name="name">SPSL: Send Approval Reminders</field>
+            <field name="model_id" ref="model_spsl_approval_request"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">6</field>
+            <field name="interval_type">hours</field>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_approval_reminders()</field>
+            <field name="priority">10</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Audit log retention - monthly archival (1st of each month at 02:00 AM) -->
+        <record id="cron_audit_retention" model="ir.cron">
+            <field name="name">SPSL: Archive Audit Logs (7-Year Retention)</field>
+            <field name="model_id" ref="model_spsl_audit_log"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="state">code</field>
+            <field name="code">model._cron_audit_retention()</field>
+            <field name="priority">15</field>
+            <field name="active" eval="True"/>
+            <field name="nextcall">2026-05-01 02:00:00</field>
+        </record>
+    </data>
+</odoo>

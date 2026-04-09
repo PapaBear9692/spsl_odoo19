@@ -217,6 +217,24 @@ Since 19.0, odoo.osv is deprecated use odoo.fields.Domain
 
 ---
 
+## Testing Status
+
+### Not Tested ⚠️
+
+The following features could not be tested due to missing UI views:
+
+1. **Approval Request** — No form/list view available for `spsl.approval.request` model
+2. **Approval Queue** — Views exist in `views/approval_queue_views.xml` but not verified functional
+3. **Chain Integrity** — Model exists but no dedicated UI to verify chain integrity
+4. **Verify Audit Chain** — No page to display and verify audit chain records
+
+Views need to be created or verified for:
+- `spsl.approval.request` form and tree views
+- Approval queue functionality
+- Audit chain verification UI
+
+---
+
 ## Remaining Tasks
 
 1. **Migrate `_sql_constraints`** to Odoo 19 `model.Constraint` format in `approval_rule.py`
@@ -226,6 +244,8 @@ Since 19.0, odoo.osv is deprecated use odoo.fields.Domain
 3. **Uncomment commented fields** after installing dependencies
 4. **Add unit tests** in `tests/` directory
 5. **Create views** for approval rule configuration UI
+6. **Verify approval queue views** in `views/approval_queue_views.xml`
+7. **Create audit chain verification views**
 
 ---
 

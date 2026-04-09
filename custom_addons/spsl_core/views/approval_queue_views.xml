@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    # Approval Queue — personal dashboard for approvers
+    <!-- ============================================================ -->
+
+    <!-- Queue: Tree / List View -->
+    <record id="view_spsl_approval_queue_tree" model="ir.ui.view">
+        <field name="name">spsl.approval.queue.tree</field>
+        <field name="model">spsl.approval.request</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="days_pending >= 2 and state == 'pending'"
+                  decoration-warning="days_pending >= 1 and days_pending &lt; 2 and state == 'pending'"
+                  decoration-success="state == 'approved'"
+                  decoration-muted="state == 'rejected'"
+                  default_order="requested_date asc">
+                <field name="document_ref" string="Document Reference"/>
+                <field name="model_name" string="Model"/>
+                <field name="res_name" string="Amount / Subject"/>
+                <field name="requested_by"/>
+                <field name="requested_date" string="Requested Date"/>
+                <field name="days_pending" string="Days Pending"/>
+                <field name="escalated" widget="boolean_toggle"/>
+                <field name="state" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Queue: Kanban View -->
+    <record id="view_spsl_approval_queue_kanban" model="ir.ui.view">
+        <field name="name">spsl.approval.queue.kanban</field>
+        <field name="model">spsl.approval.request</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" group_create="false"
+                    group_delete="false" group_edit="false">
+                <field name="name"/>
+                <field name="document_ref"/>
+                <field name="res_name"/>
+                <field name="model_name"/>
+                <field name="requested_by"/>
+                <field name="requested_date"/>
+                <field name="days_pending"/>
+                <field name="escalated"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <strong><field name="res_name"/></strong>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <t t-if="record.escalated.raw_value">
+                                            <span class="badge text-bg-warning">Escalated</span>
+                                        </t>
+                                        <t t-if="record.days_pending.raw_value >= 2">
+                                            <span class="badge text-bg-danger">
+                                                <t t-out="record.days_pending.raw_value"/>d
+                                            </span>
+                                        </t>
+                                        <t t-elif="record.days_pending.raw_value >= 1">
+                                            <span class="badge text-bg-warning">
+                                                <t t-out="record.days_pending.raw_value"/>d
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="badge text-bg-info">
+                                                <t t-out="record.days_pending.raw_value"/>d
+                                            </span>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <field name="model_name"/>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <field name="requested_by"/>
+                                    </div>
+                                    <div class="col-6 text-end text-muted small">
+                                        <field name="requested_date"
+                                               widget="relative_date"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Queue: Search View -->
+    <record id="view_spsl_approval_queue_search" model="ir.ui.view">
+        <field name="name">spsl.approval.queue.search</field>
+        <field name="model">spsl.approval.request</field>
+        <field name="arch" type="xml">
+            <search string="My Approval Queue">
+                <field name="name" string="Reference"/>
+                <field name="document_ref" string="Document"/>
+                <field name="model_name" string="Model"/>
+                <field name="requested_by"/>
+                <field name="requested_date"/>
+                <separator/>
+                <filter name="queue_my_pending" string="My Pending Approvals"
+                        domain="[('state', '=', 'pending'),
+                                 ('approver_user_ids', 'in', [uid])]"/>
+                <filter name="queue_all_pending" string="All Pending"
+                        domain="[('state', '=', 'pending')]"/>
+                <filter name="queue_overdue" string="Overdue (&gt;48h)"
+                        domain="[('state', '=', 'pending'),
+                                 ('requested_date', '&lt;=', (context_today() - datetime.timedelta(days=2)).strftime('%Y-%m-%d'))]"/>
+                <filter name="queue_escalated" string="Escalated"
+                        domain="[('escalated', '=', True)]"/>
+                <separator/>
+                <filter name="queue_approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter name="queue_rejected" string="Rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter name="queue_date_today" string="Today"
+                        domain="[('requested_date', '&gt;=', (context_today()).strftime('%Y-%m-%d'))]"/>
+                <filter name="queue_date_week" string="This Week"
+                        domain="[('requested_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="queue_group_model" string="Model"
+                        context="{'group_by': 'model_name'}"/>
+                <filter name="queue_group_date" string="Request Date"
+                        context="{'group_by': 'requested_date:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Queue: Action -->
+    <record id="action_spsl_approval_queue" model="ir.actions.act_window">
+        <field name="name">My Approval Queue</field>
+        <field name="res_model">spsl.approval.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_queue_my_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No approvals pending your action
+            </p>
+            <p>
+                When documents are submitted for approval and assigned to
+                you (or your group), they will appear here. Use this queue
+                to review and act on pending approvals.
+            </p>
+        </field>
+    </record>
+
+    <!-- Queue: Menu Item -->
+    <menuitem id="menu_spsl_approval_queue"
+              name="My Approval Queue"
+              action="action_spsl_approval_queue"
+              parent="menu_spsl_approvals"
+              sequence="25"/>
+</odoo>

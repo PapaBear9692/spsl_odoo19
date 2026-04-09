@@ -3,6 +3,9 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class ApprovalMixin(models.AbstractModel):
@@ -82,6 +85,48 @@ class ApprovalMixin(models.AbstractModel):
             if record.approval_state == 'pending' and record.approval_request_id:
                 label += _(' (Request: %s)', record.approval_request_id.name)
             record.approval_status_display = label
+
+    # ---------------------------------------------------------------
+    # CRUD overrides
+    # ---------------------------------------------------------------
+    # Fields that are always allowed to be written, even on approved records.
+    _APPROVAL_IMMUTABLE_SYSTEM_FIELDS = {
+        'write_date', 'write_uid', '__last_update',
+        'message_ids', 'message_follower_ids', 'message_partner_ids',
+        'activity_ids', 'activity_state', 'activity_date_deadline',
+        'activity_summary', 'activity_type_id', 'activity_user_id',
+    }
+
+    def write(self, vals):
+        """Block modifications to approved documents.
+
+        Once approval_state is 'approved', no business field may be
+        changed. Only system tracking fields and approval_state itself
+        (for state transitions) are exempt. To modify an approved
+        document, the approval must first be rejected, reverting the
+        document to draft.
+        """
+        # Collect keys that are actual business fields
+        business_fields = set(vals.keys()) - self._APPROVAL_IMMUTABLE_SYSTEM_FIELDS
+        if business_fields:
+            for record in self:
+                if record.approval_state == self.APPROVAL_APPROVED:
+                    # If the only business field being written is
+                    # approval_state (state transition), allow it.
+                    non_state = business_fields - {'approval_state'}
+                    if non_state:
+                        _logger.warning(
+                            'Blocked write on approved %s id=%d by user=%s '
+                            'fields=%s',
+                            record._name, record.id,
+                            self.env.user.login, non_state,
+                        )
+                        raise UserError(_(
+                            'Approved documents cannot be modified. '
+                            'To make changes, the approval must be rejected '
+                            'and the document re-submitted.'
+                        ))
+        return super().write(vals)
 
     # ---------------------------------------------------------------
     # Rule & Tier matching
@@ -190,6 +235,41 @@ class ApprovalMixin(models.AbstractModel):
         })
         return True
 
+    # ---------------------------------------------------------------
+    # Hook methods (override in downstream models)
+    # ---------------------------------------------------------------
+    def _on_approval_complete(self, approval_request):
+        """Hook called when an approval request is approved.
+
+        Override this method in downstream models to implement
+        post-approval business logic. For example:
+
+            def _on_approval_complete(self, approval_request):
+                super()._on_approval_complete(approval_request)
+                self.action_confirm()  # e.g. confirm a sale order
+
+        Args:
+            approval_request: The spsl.approval.request record that
+                was approved.
+        """
+        self.ensure_one()
+
+    def _on_approval_rejected(self, approval_request):
+        """Hook called when an approval request is rejected.
+
+        Override this method in downstream models to implement
+        post-rejection business logic. For example:
+
+            def _on_approval_rejected(self, approval_request):
+                super()._on_approval_rejected(approval_request)
+                self.write({'state': 'cancel'})
+
+        Args:
+            approval_request: The spsl.approval.request record that
+                was rejected, containing rejection_reason.
+        """
+        self.ensure_one()
+
     def action_approve(self):
         """Approve the record."""
         self.ensure_one()
@@ -209,7 +289,8 @@ class ApprovalMixin(models.AbstractModel):
 
         self.write({'approval_state': self.APPROVAL_REJECTED})
         if self.approval_request_id:
-            self.approval_request_id.action_reject(reason)
+            self.approval_request_id.write({'rejection_reason': reason})
+            self.approval_request_id.action_reject()
         return True
 
     def action_reset_to_draft(self):
