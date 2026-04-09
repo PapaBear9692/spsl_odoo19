@@ -94,6 +94,84 @@ Model attribute '_sql_constraints' is no longer supported, please define model.C
 
 ---
 
+### 11. Blank Page — Missing JS Registry Import ✅ FIXED
+**Problem:** Browser showed blank page. `spsl_core.js` used `registry` without importing it.
+
+**Error:** `ReferenceError: registry is not defined` crashed the entire Odoo web client.
+
+**Solution:** Added `import { registry } from "@web/core/registry";` in `static/src/js/spsl_core.js`
+
+**Key lesson:** A broken JS module in `web.assets_backend` can crash the entire Odoo web interface. Always import all dependencies.
+
+---
+
+### 12. odoo.osv.expression Deprecated ✅ FIXED
+**Problem:** `audit_mixin.py` imported `from odoo.osv import expression` which is deprecated in Odoo 19
+
+**Warning:**
+```
+Since 19.0, odoo.osv is deprecated use odoo.fields.Domain
+```
+
+**Solution:** Commented out the import in `models/mixins/audit_mixin.py`
+
+---
+
+## Models Updated
+
+### spsl.approval.request — Major Update ✅
+**File:** `models/approval/approvalRequest.py`
+
+**Changes:**
+- Replaced `model` + `res_id` with `document_ref` (Reference field)
+- Added `model_name` and `record_id` as computed fields from `document_ref`
+- Added `rule_id` (Many2one to `spsl.approval.rule`)
+- Added `rule_line_id` (Many2one to `spsl.approval.rule.line` — matched tier)
+- Added `escalated` (Boolean) and `escalation_date` (Datetime)
+- Added `deputy_approver_id` (Many2one to `res.users`)
+- Added `comments` (Text)
+- Added state transition validation in `action_submit()`, `action_approve()`, `action_reject()`
+- Added `action_escalate()` and `action_reset_to_draft()` methods
+- Added `_check_escalation_date` constraint
+
+### spsl.approval.rule — New ✅
+**File:** `models/approval/approval_rule.py`
+
+**Fields:** name, model_name (Selection from ir.model), field_trigger, active, company_id, line_ids (One2many)
+**Constraint:** `_check_field_trigger_exists` validates field exists on target model
+
+### spsl.approval.rule.line — New ✅
+**File:** `models/approval/approval_rule.py`
+
+**Fields:** rule_id, sequence, amount_from, amount_to, approver_group_id, approver_user_id, require_all
+**Constraint:** `_check_amount_range` validates `amount_from < amount_to` (when `amount_to > 0`)
+
+---
+
+## Models Created (Full List)
+
+| Model | File | Type | Status |
+|-------|------|------|--------|
+| `spsl.mixin.approval` | `models/mixins/approval_mixin.py` | Abstract | ✅ |
+| `spsl.mixin.audit` | `models/mixins/audit_mixin.py` | Abstract | ✅ |
+| `spsl.mixin.branch` | `models/mixins/branch_mixin.py` | Abstract | ✅ (partial) |
+| `spsl.approval.request` | `models/approval/approvalRequest.py` | Model | ✅ Updated |
+| `spsl.approval.level` | `models/approval/approvalLevel.py` | Model | ✅ |
+| `spsl.approval.transition` | `models/approval/approvalLevel.py` | Model | ✅ |
+| `spsl.approval.rule` | `models/approval/approval_rule.py` | Model | ✅ New |
+| `spsl.approval.rule.line` | `models/approval/approval_rule.py` | Model | ✅ New |
+| `spsl.audit.log` | `models/audit/auditLog.py` | Model | ✅ |
+| `spsl.audit.config` | `models/audit/auditConfig.py` | Model | ✅ |
+| `spsl.notification.event` | `models/notification/notificationEvent.py` | Model | ✅ |
+| `spsl.notification.template` | `models/notification/notificationTemplate.py` | Model | ✅ |
+| `spsl.notification.log` | `models/notification/notificationLog.py` | Model | ✅ |
+| `spsl.commission.rule` | `models/commission/commissionRule.py` | Model | ✅ |
+| `spsl.commission.entry` | `models/commission/commissionRule.py` | Model | ✅ |
+| `spsl.commission.entry.line` | `models/commission/commissionRule.py` | Model | ✅ |
+| `spsl.commission.aggregation` | `models/commission/commissionAggregation.py` | Model | ✅ (partial) |
+
+---
+
 ## Files Commented Out
 
 | File | What | Reason |
@@ -110,30 +188,6 @@ Model attribute '_sql_constraints' is no longer supported, please define model.C
 
 ---
 
-## Models Created
-
-| Model | File | Type | Status |
-|-------|------|------|--------|
-| `spsl.mixin.approval` | `models/mixins/approval_mixin.py` | Abstract | ✅ |
-| `spsl.mixin.audit` | `models/mixins/audit_mixin.py` | Abstract | ✅ |
-| `spsl.mixin.branch` | `models/mixins/branch_mixin.py` | Abstract | ✅ (partial) |
-| `spsl.approval.request` | `models/approval/approvalRequest.py` | Model | ✅ |
-| `spsl.approval.level` | `models/approval/approvalLevel.py` | Model | ✅ |
-| `spsl.approval.transition` | `models/approval/approvalLevel.py` | Model | ✅ |
-| `spsl.approval.rule` | `models/approval/approval_rule.py` | Model | ✅ NEW |
-| `spsl.approval.rule.line` | `models/approval/approval_rule.py` | Model | ✅ NEW |
-| `spsl.audit.log` | `models/audit/auditLog.py` | Model | ✅ |
-| `spsl.audit.config` | `models/audit/auditConfig.py` | Model | ✅ |
-| `spsl.notification.event` | `models/notification/notificationEvent.py` | Model | ✅ |
-| `spsl.notification.template` | `models/notification/notificationTemplate.py` | Model | ✅ |
-| `spsl.notification.log` | `models/notification/notificationLog.py` | Model | ✅ |
-| `spsl.commission.rule` | `models/commission/commissionRule.py` | Model | ✅ |
-| `spsl.commission.entry` | `models/commission/commissionRule.py` | Model | ✅ |
-| `spsl.commission.entry.line` | `models/commission/commissionRule.py` | Model | ✅ |
-| `spsl.commission.aggregation` | `models/commission/commissionAggregation.py` | Model | ✅ (partial) |
-
----
-
 ## Security Groups Created
 
 | Group ID | Name | Implies |
@@ -146,6 +200,20 @@ Model attribute '_sql_constraints' is no longer supported, please define model.C
 | `group_spsl_notification_admin` | Notification Admin | `spsl_core_group_user` |
 | `group_spsl_commission_manager` | Commission Manager | `spsl_core_group_user` |
 | `group_hq_all_branches` | HQ All Branches | `spsl_core_group_manager` |
+
+---
+
+## Odoo 19 Breaking Changes Encountered
+
+| Feature | Old (Odoo ≤18) | New (Odoo 19) | Impact |
+|---------|----------------|---------------|--------|
+| `category_id` on `res.groups` | Supported | Removed | Security XML simplified |
+| `users` field on `res.groups` | Supported | Removed | Cannot assign users via XML |
+| `unique=True` field param | Supported | Not supported | Removed from 3 models |
+| `_sql_constraints` | Supported | Deprecated | Warning only, needs migration |
+| `account.period` model | Available | Removed | Replaced with Date fields |
+| `odoo.osv.expression` | Available | Deprecated | Use `odoo.fields.Domain` |
+| JS module imports | Lenient | Strict | Missing import crashes web client |
 
 ---
 
@@ -165,7 +233,6 @@ Model attribute '_sql_constraints' is no longer supported, please define model.C
 
 ### Step 1: Install missing modules
 ```bash
-# When OCA releases Odoo 19 compatible versions
 git clone https://github.com/OCA/operating-unit.git -b 19.0 custom_addons/operating_unit
 ```
 

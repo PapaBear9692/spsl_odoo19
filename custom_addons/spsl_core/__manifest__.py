@@ -21,12 +21,12 @@
         # Data
         "data/sequence_data.xml",
         "data/mail_template_data.xml",
+        # Views
+        "views/approval_views.xml",
         # Test Views (remove in production)
         # "views/test_views.xml",
     ],
-    "demo": [
-        "demo/demo_data.xml",
-    ],
+    "demo": [],
     "assets": {
         "web.assets_backend": [
             "spsl_core/static/src/js/spsl_core.js",

@@ -1,32 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Demo Approval Levels -->
-    <record id="demo_approval_level_1" model="spsl.approval.level">
-        <field name="name">Level 1 - Manager</field>
-        <field name="sequence">10</field>
-    </record>
-    <record id="demo_approval_level_2" model="spsl.approval.level">
-        <field name="name">Level 2 - Director</field>
-        <field name="sequence">20</field>
-        <field name="is_escalation">1</field>
-        <field name="escalation_hours">48</field>
-    </record>
-    <record id="demo_approval_level_3" model="spsl.approval.level">
-        <field name="name">Level 3 - CEO</field>
-        <field name="sequence">30</field>
+    <!-- Demo Approval Rules using res.partner (always available) -->
+
+    <!-- Rule 1: Partner Credit Approval -->
+    <record id="demo_approval_rule_credit" model="spsl.approval.rule">
+        <field name="name">Partner Credit Limit Approval</field>
+        <field name="model_name">res.partner</field>
+        <field name="field_trigger">credit_limit</field>
+        <field name="active" eval="True"/>
     </record>
 
-    <!-- Demo Commission Rules -->
-    <record id="demo_commission_rule_sales" model="spsl.commission.rule">
-        <field name="name">Sales Commission 5%</field>
-        <field name="code">SALES_5PCT</field>
-        <field name="calculation_type">percentage</field>
-        <field name="percentage">5.0</field>
+    <!-- Tier 1: Up to 5,000 -->
+    <record id="demo_rule_credit_tier1" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="demo_approval_rule_credit"/>
+        <field name="sequence">10</field>
+        <field name="amount_from">0</field>
+        <field name="amount_to">5000</field>
+        <field name="require_all" eval="False"/>
     </record>
-    <record id="demo_commission_rule_target" model="spsl.commission.rule">
-        <field name="name">Target Bonus Commission</field>
-        <field name="code">TARGET_BONUS</field>
-        <field name="calculation_type">fixed</field>
-        <field name="fixed_amount">10000</field>
+
+    <!-- Tier 2: 5,000 – 50,000 -->
+    <record id="demo_rule_credit_tier2" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="demo_approval_rule_credit"/>
+        <field name="sequence">20</field>
+        <field name="amount_from">5000</field>
+        <field name="amount_to">50000</field>
+        <field name="require_all" eval="False"/>
+    </record>
+
+    <!-- Tier 3: 50,000+ (unlimited) -->
+    <record id="demo_rule_credit_tier3" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="demo_approval_rule_credit"/>
+        <field name="sequence">30</field>
+        <field name="amount_from">50000</field>
+        <field name="amount_to">0</field>
+        <field name="require_all" eval="True"/>
+    </record>
+
+    <!-- Rule 2: Contact Approval -->
+    <record id="demo_approval_rule_contact" model="spsl.approval.rule">
+        <field name="name">Contact Creation Approval</field>
+        <field name="model_name">res.partner</field>
+        <field name="field_trigger">credit_limit</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="demo_rule_contact_tier1" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="demo_approval_rule_contact"/>
+        <field name="sequence">10</field>
+        <field name="amount_from">0</field>
+        <field name="amount_to">10000</field>
+        <field name="require_all" eval="False"/>
+    </record>
+
+    <record id="demo_rule_contact_tier2" model="spsl.approval.rule.line">
+        <field name="rule_id" ref="demo_approval_rule_contact"/>
+        <field name="sequence">20</field>
+        <field name="amount_from">10000</field>
+        <field name="amount_to">0</field>
+        <field name="require_all" eval="True"/>
     </record>
 </odoo>

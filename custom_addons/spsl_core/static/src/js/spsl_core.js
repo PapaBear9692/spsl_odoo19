@@ -2,13 +2,13 @@
 
 /**
  * Copyright 2026 SPSL - Smart Printing Service Limited
- * License OPL-1
+ * License LGPL-3
  *
  * SPSL Core JavaScript Module
- * Provides frontend utilities and components for the SPSL Core module
  */
 
-import { Component, useState, useRef } from "@odoo/owl";
+import { Component } from "@odoo/owl";
+import { registry } from "@web/core/registry";
 
 class ApprovalWidget extends Component {
     static template = "spsl_core.approval_badge";
