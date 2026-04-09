@@ -138,10 +138,6 @@
                                         widget="section_and_note_text"
                                         optional="show"
                                     />
-                                    <field
-                                        name="product_uom_category_id"
-                                        column_invisible="True"
-                                    />
 
                                     <field
                                         name="analytic_distribution"

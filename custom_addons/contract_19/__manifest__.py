@@ -10,6 +10,7 @@
     "depends": ["base", "account", "product", "portal"],
     "development_status": "Production/Stable",
     "data": [
+        "data/ir_ui_menu.xml",
         "security/contract_tag.xml",
         "security/ir.model.access.csv",
         "security/contract_security.xml",
@@ -19,7 +20,6 @@
         "data/mail_template.xml",
         "data/template_mail_notification.xml",
         "data/mail_message_subtype.xml",
-        "data/ir_ui_menu.xml",
         "wizards/contract_manually_create_invoice.xml",
         "views/contract_tag.xml",
         "views/contract_template_line.xml",
