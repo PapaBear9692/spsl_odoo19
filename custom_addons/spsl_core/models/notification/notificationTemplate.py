@@ -100,8 +100,8 @@ class NotificationTemplate(models.Model):
 
     @api.constrains('event_code')
     def _check_event_code_format(self):
-        for record in self.event_code:
-            if record and not record.startswith('NE-'):
+        for record in self:
+            if record.event_code and not record.event_code.startswith('NE-'):
                 raise ValidationError(_('Event code must start with "NE-".'))
 
     @api.constrains('escalation_delay_hours')

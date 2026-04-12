@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================================ -->
+        <!-- Expense & Cash Events (NE-080 to NE-084)                      -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-080: Expense Report Submitted -->
+        <record id="notification_event_ne080" model="spsl.notification.template">
+            <field name="event_code">NE-080</field>
+            <field name="name">Expense Report Submitted</field>
+            <field name="description">Triggered when an employee submits an expense report. Notifies the employee's manager via in-app.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">Expense Report — {{object.employee_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>An expense report has been submitted for your approval:</p>
+<ul>
+<li><strong>Employee:</strong> {{object.employee_id.name or ''}}</li>
+<li><strong>Total:</strong> {{object.total_amount or '0.00'}}</li>
+<li><strong>Submitted:</strong> {{object.create_date or ''}}</li>
+</ul>
+<p>Please review and approve or reject.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+        </record>
+
+        <!-- NE-081: Expense Report Approved -->
+        <record id="notification_event_ne081" model="spsl.notification.template">
+            <field name="event_code">NE-081</field>
+            <field name="name">Expense Report Approved</field>
+            <field name="description">Triggered when an expense report is approved. Notifies the employee via email and in-app.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">Expense Report Approved — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.employee_id.name or ''}},</p>
+<p>Your expense report has been approved:</p>
+<ul>
+<li><strong>Report:</strong> {{object.name or ''}}</li>
+<li><strong>Total:</strong> {{object.total_amount or '0.00'}}</li>
+</ul>
+<p>Payment will be processed in the next payroll cycle.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+        </record>
+
+        <!-- NE-082: Petty Cash Replenishment -->
+        <record id="notification_event_ne082" model="spsl.notification.template">
+            <field name="event_code">NE-082</field>
+            <field name="name">Petty Cash Replenishment Required</field>
+            <field name="description">Triggered when petty cash balance falls below the minimum threshold. Notifies Branch Manager and Finance Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Petty Cash Replenishment — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Petty Cash Replenishment Required</strong></p>
+<ul>
+<li><strong>Fund:</strong> {{object.name or ''}}</li>
+<li><strong>Branch:</strong> {{object.branch_id.name or ''}}</li>
+<li><strong>Current Balance:</strong> {{object.balance or '0.00'}}</li>
+</ul>
+<p>Please arrange replenishment.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_finance_manager"/>
+        </record>
+
+        <!-- NE-083: Foreign LC Opened -->
+        <record id="notification_event_ne083" model="spsl.notification.template">
+            <field name="event_code">NE-083</field>
+            <field name="name">Foreign LC Opened</field>
+            <field name="description">Triggered when a foreign Letter of Credit is opened. Notifies Purchase Officer and CFO.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">LC Opened — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A foreign Letter of Credit has been opened:</p>
+<ul>
+<li><strong>LC:</strong> {{object.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount or '0.00'}}</li>
+<li><strong>Expiry Date:</strong> {{object.lc_expiry_date or ''}}</li>
+</ul>
+<p>Please track shipment and document deadlines.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-084: LC Document Discrepancy — MANDATORY -->
+        <record id="notification_event_ne084" model="spsl.notification.template">
+            <field name="event_code">NE-084</field>
+            <field name="name">LC Document Discrepancy</field>
+            <field name="description">Triggered when a discrepancy is found in LC shipping documents. Notifies Purchase Officer and CFO. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">LC Document Discrepancy — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>LC Document Discrepancy</strong></p>
+<ul>
+<li><strong>LC:</strong> {{object.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+</ul>
+<p>A discrepancy has been detected in the shipping documents. Immediate resolution is required to avoid payment delay or LC expiry.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Logistics Events (NE-085 to NE-087)                           -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-085: Shipment Arrived -->
+        <record id="notification_event_ne085" model="spsl.notification.template">
+            <field name="event_code">NE-085</field>
+            <field name="name">Shipment Arrived</field>
+            <field name="description">Triggered when a shipment arrives at the destination. Notifies Inventory Manager and Purchase Officer.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Shipment Arrived — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A shipment has arrived:</p>
+<ul>
+<li><strong>Shipment:</strong> {{object.name or ''}}</li>
+<li><strong>Origin:</strong> {{object.location_id.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>PO Reference:</strong> {{object.origin or ''}}</li>
+</ul>
+<p>Please arrange goods receipt and inspection.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-086: Customs Clearance Required -->
+        <record id="notification_event_ne086" model="spsl.notification.template">
+            <field name="event_code">NE-086</field>
+            <field name="name">Customs Clearance Required</field>
+            <field name="description">Triggered when an imported shipment requires customs clearance. Notifies Operations Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Customs Clearance Required — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Customs Clearance Required</strong></p>
+<ul>
+<li><strong>Shipment:</strong> {{object.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>PO Reference:</strong> {{object.origin or ''}}</li>
+</ul>
+<p>Please prepare customs documentation and arrange clearance to avoid demurrage charges.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-087: Portal — Customer Invoice Available -->
+        <record id="notification_event_ne087" model="spsl.notification.template">
+            <field name="event_code">NE-087</field>
+            <field name="name">Portal: Customer Invoice Available</field>
+            <field name="description">Triggered when a new invoice is published to the customer portal. Notifies the customer portal user via email and push.</field>
+            <field name="recipient_type">document_follower</field>
+            <field name="subject_template">New Invoice from SPSL — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.partner_id.name or 'Customer'}},</p>
+<p>A new invoice is available on your portal:</p>
+<ul>
+<li><strong>Invoice:</strong> {{object.name or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount_total or '0.00'}}</li>
+<li><strong>Due Date:</strong> {{object.invoice_date_due or ''}}</li>
+</ul>
+<p>Please log in to the portal to view and pay.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_push'))]"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Portal Events (NE-088)                                        -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-088: Portal — Payment Confirmation -->
+        <record id="notification_event_ne088" model="spsl.notification.template">
+            <field name="event_code">NE-088</field>
+            <field name="name">Portal: Payment Confirmation</field>
+            <field name="description">Triggered when a customer payment is confirmed via the portal. Sends email confirmation to the customer.</field>
+            <field name="recipient_type">document_follower</field>
+            <field name="subject_template">Payment Confirmed — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.partner_id.name or 'Customer'}},</p>
+<p>We have received your payment:</p>
+<ul>
+<li><strong>Payment:</strong> {{object.name or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount or '0.00'}}</li>
+<li><strong>Date:</strong> {{object.date or ''}}</li>
+</ul>
+<p>Thank you for your payment.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- System Events (NE-089 to NE-095)                              -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-089: System — Backup Completed -->
+        <record id="notification_event_ne089" model="spsl.notification.template">
+            <field name="event_code">NE-089</field>
+            <field name="name">System: Backup Completed</field>
+            <field name="description">Triggered when a scheduled database backup completes successfully. Notifies System Administrator via in-app.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Backup Completed Successfully</field>
+            <field name="body_template"><![CDATA[<p><strong>Backup Completed</strong></p>
+<p>The scheduled database backup has completed successfully.</p>
+<ul>
+<li><strong>Timestamp:</strong> {{object.create_date or ''}}</li>
+</ul>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-090: System — Backup Failed — MANDATORY -->
+        <record id="notification_event_ne090" model="spsl.notification.template">
+            <field name="event_code">NE-090</field>
+            <field name="name">System: Backup Failed</field>
+            <field name="description">Triggered when a scheduled database backup fails. Notifies System Administrator via email, in-app, and SMS. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">CRITICAL: Backup Failed</field>
+            <field name="body_template"><![CDATA[<p><strong>CRITICAL: Backup Failed</strong></p>
+<p>A scheduled database backup has failed. Please investigate immediately and re-trigger the backup manually.</p>
+<p>Database backups are critical for disaster recovery. Do not ignore this alert.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app')), (4, ref('spsl_core.channel_sms'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-091: System — Integrity Alert — MANDATORY -->
+        <record id="notification_event_ne091" model="spsl.notification.template">
+            <field name="event_code">NE-091</field>
+            <field name="name">System: Integrity Alert</field>
+            <field name="description">Triggered when an audit log hash chain integrity check fails. Notifies CFO and System Administrator. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">SECURITY: Audit Integrity Alert</field>
+            <field name="body_template"><![CDATA[<p><strong>Audit Log Integrity Alert</strong></p>
+<p>An integrity check has detected a potential tampering event in the audit log chain.</p>
+<p>This requires immediate investigation. All audit log modifications are strictly prohibited and may indicate unauthorized access.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+        <!-- NE-092: System — User Login from New IP -->
+        <record id="notification_event_ne092" model="spsl.notification.template">
+            <field name="event_code">NE-092</field>
+            <field name="name">System: User Login from New IP</field>
+            <field name="description">Triggered when a user logs in from an unrecognized IP address. Notifies the user and System Administrator via email.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Login from New Device — {{object.login or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A login to your account has been detected from a new IP address:</p>
+<ul>
+<li><strong>User:</strong> {{object.login or ''}}</li>
+<li><strong>IP Address:</strong> {{object.login_ip or ''}}</li>
+<li><strong>Time:</strong> {{object.login_date or ''}}</li>
+</ul>
+<p>If this was not you, please change your password immediately and contact IT Support.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-093: System — Multiple Failed Logins — MANDATORY -->
+        <record id="notification_event_ne093" model="spsl.notification.template">
+            <field name="event_code">NE-093</field>
+            <field name="name">System: Multiple Failed Logins</field>
+            <field name="description">Triggered when multiple failed login attempts are detected. Notifies System Administrator. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Security Alert: Multiple Failed Logins</field>
+            <field name="body_template"><![CDATA[<p><strong>Security Alert: Multiple Failed Login Attempts</strong></p>
+<ul>
+<li><strong>Username:</strong> {{object.login or ''}}</li>
+<li><strong>IP Address:</strong> {{object.login_ip or ''}}</li>
+<li><strong>Time:</strong> {{object.login_date or ''}}</li>
+</ul>
+<p>This may indicate a brute-force attack. Please investigate and consider locking the account if necessary.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-094: System — Scheduled Job Failed -->
+        <record id="notification_event_ne094" model="spsl.notification.template">
+            <field name="event_code">NE-094</field>
+            <field name="name">System: Scheduled Job Failed</field>
+            <field name="description">Triggered when a scheduled batch job fails. Notifies System Administrator.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Scheduled Job Failed — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Scheduled Job Failed</strong></p>
+<ul>
+<li><strong>Job:</strong> {{object.name or ''}}</li>
+<li><strong>Scheduled Time:</strong> {{object.nextcall or ''}}</li>
+</ul>
+<p>Please investigate the failure and re-trigger the job after resolving the issue.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-095: System — Disk Space Warning — MANDATORY -->
+        <record id="notification_event_ne095" model="spsl.notification.template">
+            <field name="event_code">NE-095</field>
+            <field name="name">System: Disk Space Warning</field>
+            <field name="description">Triggered when server disk usage exceeds threshold. Notifies System Administrator. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Disk Space Warning</field>
+            <field name="body_template"><![CDATA[<p><strong>Disk Space Warning</strong></p>
+<p>Server disk usage has exceeded the warning threshold.</p>
+<p>Please review disk usage and free up space to prevent system issues.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+    </data>
+</odoo>

@@ -48,9 +48,9 @@ class ApprovalRule(models.Model):
 
     _sql_constraints = [
         (
-            'unique_rule_per_model_company',
-            'UNIQUE(model_name, company_id)',
-            'An approval rule already exists for this model and company.',
+            'unique_rule_per_model_field_company',
+            'UNIQUE(model_name, field_trigger, company_id)',
+            'An approval rule already exists for this model, trigger field, and company.',
         ),
     ]
 

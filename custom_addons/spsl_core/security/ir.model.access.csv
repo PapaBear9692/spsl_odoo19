@@ -35,3 +35,5 @@ access_spsl_commission_entry_line_manager,spsl.commission.entry.line.manager,mod
 access_spsl_commission_aggregation_user,spsl.commission.aggregation.user,model_spsl_commission_aggregation,base.group_user,1,0,0,0
 access_spsl_commission_aggregation_manager,spsl.commission.aggregation.manager,model_spsl_commission_aggregation,spsl_core.group_spsl_commission_manager,1,1,1,1
 access_audit_chain_verify_wizard,access.audit.chain.verify.wizard,model_spsl_audit_chain_verify_wizard,base.group_user,1,1,1,1
+access_spsl_notification_dispatcher_user,spsl.notification.dispatcher.user,model_spsl_notification_dispatcher,base.group_user,1,0,0,0
+access_spsl_notification_dispatcher_admin,spsl.notification.dispatcher.admin,model_spsl_notification_dispatcher,spsl_core.group_spsl_notification_admin,1,1,1,0

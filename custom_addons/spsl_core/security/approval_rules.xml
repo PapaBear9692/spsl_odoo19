@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- ============================================================ -->
-    # Record Rules — spsl.approval.request visibility
+    <!-- Record Rules — spsl.approval.request visibility               -->
     <!-- ============================================================ -->
-    # A user can see an approval request if they are:
-    #   1. The requester (requested_by = user)
-    #   2. The designated specific approver (rule_line_id.approver_user_id = user)
-    #   3. A member of the designated approver group
-    #   4. The deputy assigned to the request (deputy_approver_id = user)
-    #   5. A member of the Approval Manager group (full visibility)
+    <!-- A user can see an approval request if they are:               -->
+    <!--   1. The requester (requested_by = user)                      -->
+    <!--   2. The designated specific approver (rule_line_id.approver_user_id = user) -->
+    <!--   3. A member of the designated approver group                -->
+    <!--   4. The deputy assigned to the request (deputy_approver_id = user) -->
+    <!--   5. A member of the Approval Manager group (full visibility) -->
     <!-- ============================================================ -->
 
     <!-- Approval Manager: see all requests (no restriction) -->
@@ -33,10 +33,10 @@
     </record>
 
     <!-- ============================================================ -->
-    # Record Rules — spsl.approval.deputy visibility
+    <!-- Record Rules — spsl.approval.deputy visibility                -->
     <!-- ============================================================ -->
-    # Deputy records are visible to the absent approver (user_id),
-    # the deputy themselves, and Approval Managers.
+    <!-- Deputy records are visible to the absent approver (user_id),  -->
+    <!-- the deputy themselves, and Approval Managers.                 -->
     <!-- ============================================================ -->
 
     <!-- Approval Manager: see all deputy records -->

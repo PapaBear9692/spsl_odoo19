@@ -4,3 +4,4 @@ from . import notificationEvent
 from . import notificationChannel
 from . import notificationTemplate
 from . import notificationLog
+from . import notificationDispatcher

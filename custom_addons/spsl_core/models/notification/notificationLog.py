@@ -1,4 +1,8 @@
-from odoo import models, fields, api
+# Copyright 2026 SPSL - Smart Printing Service Limited
+# License LGPL-3 (https://www.gnu.org/licenses/lgpl-3.0.html)
+
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class NotificationLog(models.Model):
@@ -6,16 +10,8 @@ class NotificationLog(models.Model):
     _description = 'SPSL Notification Log'
     _order = 'id desc'
 
-    name = fields.Char(
-        string='Reference',
-        required=True,
-        copy=False,
-        readonly=True,
-        default=lambda self: self._generate_name(),
-    )
-    event_id = fields.Many2one(
-        'spsl.notification.event',
-        string='Event',
+    event_code = fields.Char(
+        string='Event Code',
         required=True,
         index=True,
     )
@@ -24,100 +20,91 @@ class NotificationLog(models.Model):
         string='Template',
         index=True,
     )
-    model = fields.Char(
-        string='Model',
-        index=True,
-    )
-    res_id = fields.Integer(
-        string='Resource ID',
-        index=True,
-    )
-    res_name = fields.Char(
-        string='Resource Name',
-        compute='_compute_res_name',
-        store=True,
-    )
-    recipient_id = fields.Many2one(
-        'res.partner',
-        string='Recipient',
-        index=True,
-    )
     channel = fields.Selection(
         selection=[
+            ('in_app', 'In-App'),
             ('email', 'Email'),
             ('sms', 'SMS'),
+            ('push', 'Push'),
         ],
         string='Channel',
         required=True,
+    )
+    recipient_id = fields.Many2one(
+        'res.users',
+        string='Recipient User',
         index=True,
     )
-    state = fields.Selection(
+    recipient_email = fields.Char(
+        string='Recipient Email',
+    )
+    recipient_phone = fields.Char(
+        string='Recipient Phone',
+    )
+    sent_date = fields.Datetime(
+        string='Sent Date',
+        default=fields.Datetime.now,
+        index=True,
+    )
+    status = fields.Selection(
         selection=[
-            ('pending', 'Pending'),
+            ('queued', 'Queued'),
             ('sent', 'Sent'),
+            ('delivered', 'Delivered'),
             ('failed', 'Failed'),
+            ('bounced', 'Bounced'),
         ],
         string='Status',
-        default='pending',
         required=True,
-        index=True,
-    )
-    subject = fields.Char(
-        string='Subject',
-    )
-    body = fields.Text(
-        string='Body',
+        default='queued',
     )
     error_message = fields.Text(
         string='Error Message',
     )
-    sent_date = fields.Datetime(
-        string='Sent Date',
-        index=True,
+    document_ref = fields.Reference(
+        string='Document Reference',
+        selection='_get_document_models',
     )
-    create_date = fields.Datetime(
-        string='Created Date',
-        readonly=True,
-        index=True,
+    retry_count = fields.Integer(
+        string='Retry Count',
+        default=0,
     )
-
-    @api.depends('model', 'res_id')
-    def _compute_res_name(self):
-        for record in self:
-            if record.model and record.res_id:
-                res = self.env[record.model].browse(record.res_id)
-                record.res_name = res.display_name if res.exists() else False
-            else:
-                record.res_name = False
-
-    def _generate_name(self):
-        sequence = self.env['ir.sequence'].next_by_code('spsl.notification.log')
-        return sequence or f'NOT/{fields.Date.today().year}/0000'
+    next_retry_date = fields.Datetime(
+        string='Next Retry Date',
+    )
 
     @api.model
-    def _dispatch_notification(self, record, event, template, context):
-        partner = record.partner_id if hasattr(record, 'partner_id') else False
-        if not partner:
-            return False
-        preference = getattr(record, 'notification_preference', 'email')
-        results = []
-        if preference in ['email', 'both']:
-            results.append(self._send_email(record, event, template, partner, context))
-        if preference in ['sms', 'both']:
-            results.append(self._send_sms(record, event, template, partner, context))
-        return any(results)
+    def _get_document_models(self):
+        models = self.env['ir.model'].search([('is_mail_thread', '=', True)])
+        return [(m.model, m.name) for m in models]
 
-    def _send_email(self, record, event, template, partner, context):
-        try:
-            self.env['mail.mail'].create({
-                'email_from': self.env.company.email or 'noreply@spsl.com.bd',
-                'email_to': partner.email,
-                'subject': template.subject or event.name,
-                'body_html': template.body_html or '',
-            })
-            return True
-        except Exception as e:
-            return False
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'sent_date' not in vals:
+                vals['sent_date'] = fields.Datetime.now()
+        return super().create(vals_list)
 
-    def _send_sms(self, record, event, template, partner, context):
-        return True
+    def write(self, vals):
+        # Only allow updating status-related fields (immutability for the rest)
+        immutable_fields = {
+            'event_code', 'template_id', 'channel', 'recipient_id',
+            'recipient_email', 'recipient_phone', 'sent_date', 'document_ref',
+        }
+        for record in self:
+            blocked = immutable_fields & set(vals.keys())
+            if blocked:
+                raise ValidationError(_(
+                    'Notification log fields %(fields)s are immutable and cannot be modified.',
+                    fields=', '.join(sorted(blocked)),
+                ))
+        return super().write(vals)
+
+    @api.model
+    def _auto_init(self):
+        result = super()._auto_init()
+        self.env.cr.execute("""
+            CREATE INDEX IF NOT EXISTS spsl_notification_log_event_status_date_idx
+            ON spsl_notification_log (event_code, status, sent_date)
+        """)
+        return result

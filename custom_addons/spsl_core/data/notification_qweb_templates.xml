@@ -1,0 +1,769 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Shared QWeb Header / Footer for all SPSL notifications       -->
+    <!-- Used by the dispatcher to wrap body_template content          -->
+    <!-- ============================================================ -->
+
+    <template id="spsl_notification_header" name="SPSL Notification Header">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>
+                        <h2 style="color:#FFFFFF;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:22px;">
+                            Smart Printing Solution Ltd.
+                        </h2>
+                        <p style="color:#8FAEC8;margin:4px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;">
+                            ERP Notification
+                        </p>
+                    </td>
+                    <td style="text-align:right;">
+                        <span style="color:#FFFFFF;font-family:Arial,Helvetica,sans-serif;font-size:11px;">
+                            SPSL &amp;middot; Dhaka, Bangladesh
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </template>
+
+    <template id="spsl_notification_footer" name="SPSL Notification Footer">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>
+                        <p style="color:#6C757D;font-family:Arial,Helvetica,sans-serif;font-size:12px;margin:0 0 8px 0;">
+                            <strong>Smart Printing Solution Ltd.</strong>
+                        </p>
+                        <p style="color:#6C757D;font-family:Arial,Helvetica,sans-serif;font-size:11px;margin:0 0 4px 0;">
+                            House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh
+                        </p>
+                        <p style="color:#6C757D;font-family:Arial,Helvetica,sans-serif;font-size:11px;margin:0 0 4px 0;">
+                            Tel: +880-2-8812345 &amp;middot; Email: info@spsl.com.bd
+                        </p>
+                        <p style="color:#6C757D;font-family:Arial,Helvetica,sans-serif;font-size:11px;margin:0;">
+                            Web: <a href="https://spsl.com.bd" style="color:#1B3A5C;">www.spsl.com.bd</a>
+                        </p>
+                    </td>
+                    <td style="text-align:right;vertical-align:bottom;">
+                        <p style="color:#ADB5BD;font-family:Arial,Helvetica,sans-serif;font-size:10px;margin:0;">
+                            This is an automated notification from the SPSL ERP system.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </template>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-001: MPS Invoice Generated — Rich HTML Body                -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne001" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#8FAEC8;margin:4px 0 0 0;font-size:13px;">Invoice Notification</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <p style="font-size:15px;">Dear <strong>{{object.partner_id.name or 'Customer'}}</strong>,</p>
+        <p style="font-size:14px;">A new invoice has been generated for your account. Please find the details below:</p>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;margin:20px 0;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Invoice Number</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Invoice Date</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.invoice_date or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:16px;font-weight:bold;color:#1B3A5C;">BDT {{object.amount_total or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Outstanding Balance</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;color:#DC3545;">BDT {{object.amount_residual or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Due Date</td>
+                <td style="font-size:14px;font-weight:bold;color:#DC3545;">{{object.invoice_date_due or ''}}</td>
+            </tr>
+        </table>
+        <div style="text-align:center;margin:25px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#1B3A5C;color:#FFFFFF;padding:12px 30px;border-radius:5px;text-decoration:none;font-size:14px;font-weight:bold;">
+                View Invoice &amp; Pay Now
+            </a>
+        </div>
+        <p style="font-size:13px;color:#6C757D;">If the button above does not work, copy and paste the following link into your browser:<br/>
+        <a href="{{object.access_url or '#'}}" style="color:#1B3A5C;">{{object.access_url or ''}}</a></p>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">Tel: +880-2-8812345 | Email: info@spsl.com.bd</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">This is an automated notification. Please do not reply to this email.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-003: MPS Contract Expiry in 90 Days — Rich HTML            -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne003" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#FFC107;margin:4px 0 0 0;font-size:13px;font-weight:bold;">Contract Renewal Warning</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#FFF3CD;border-left:4px solid #FFC107;padding:15px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:14px;color:#856404;"><strong>Notice:</strong> This contract expires in <strong>90 days</strong>. Please initiate renewal discussions.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Contract</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Customer</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.partner_id.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Contract End Date</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;color:#DC3545;">{{object.date_end or ''}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Assigned Account Manager</td>
+                <td style="font-size:14px;">{{object.user_id.name or ''}}</td>
+            </tr>
+        </table>
+        <h4 style="margin:25px 0 10px 0;font-size:14px;color:#1B3A5C;">Action Required</h4>
+        <ul style="font-size:13px;line-height:1.8;">
+            <li>Contact the customer to discuss renewal terms</li>
+            <li>Review current contract pricing and CPC rates</li>
+            <li>Prepare renewal proposal for customer approval</li>
+            <li>Update contract record in the ERP with renewal status</li>
+        </ul>
+        <div style="text-align:center;margin:20px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#1B3A5C;color:#FFFFFF;padding:12px 30px;border-radius:5px;text-decoration:none;font-size:14px;font-weight:bold;">
+                View Contract
+            </a>
+        </div>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">Tel: +880-2-8812345 | Email: info@spsl.com.bd</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">This is an automated notification. Please do not reply to this email.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-004: MPS Contract Expiry in 30 Days — Rich HTML            -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne004" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#FF6B6B;margin:4px 0 0 0;font-size:13px;font-weight:bold;">URGENT: Contract Expiry in 30 Days</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#F8D7DA;border-left:4px solid #DC3545;padding:15px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:14px;color:#721C24;"><strong>URGENT:</strong> This contract expires in <strong>30 days</strong>. Immediate action is required to secure renewal. Escalation to Sales Director at Day 15.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Contract</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Customer</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.partner_id.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Contract End Date</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:16px;font-weight:bold;color:#DC3545;">{{object.date_end or ''}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Escalation Date</td>
+                <td style="font-size:14px;font-weight:bold;color:#FF6B6B;">Day 15 to Sales Director</td>
+            </tr>
+        </table>
+        <h4 style="margin:25px 0 10px 0;font-size:14px;color:#DC3545;">Immediate Actions Required</h4>
+        <ul style="font-size:13px;line-height:1.8;">
+            <li><strong>Customer Meeting:</strong> Schedule an urgent meeting to present renewal terms</li>
+            <li><strong>Renewal Proposal:</strong> Prepare and send the renewal proposal immediately</li>
+            <li><strong>Equipment Review:</strong> Assess if equipment upgrades are needed for the renewed contract</li>
+            <li><strong>Internal Escalation:</strong> Notify MPS Manager and Sales Director of the renewal status</li>
+        </ul>
+        <div style="text-align:center;margin:20px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#DC3545;color:#FFFFFF;padding:12px 30px;border-radius:5px;text-decoration:none;font-size:14px;font-weight:bold;">
+                View Contract Now
+            </a>
+        </div>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">Tel: +880-2-8812345 | Email: info@spsl.com.bd</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">This is an automated notification. Please do not reply to this email.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-010: AR Overdue Day 7 — Level 1 Dunning                   -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne010" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#FFC107;margin:4px 0 0 0;font-size:13px;font-weight:bold;">Payment Reminder — Level 1 Dunning</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <p style="font-size:15px;">Dear <strong>{{object.partner_id.name or 'Customer'}}</strong>,</p>
+        <p style="font-size:14px;">This is a friendly reminder that your invoice payment is now <strong>7 days overdue</strong>.</p>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;margin:20px 0;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Invoice Number</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Original Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">BDT {{object.amount_total or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Outstanding Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:16px;font-weight:bold;color:#DC3545;">BDT {{object.amount_residual or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Days Overdue</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">7 Days</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Due Date</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.invoice_date_due or ''}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Dunning Level</td>
+                <td><span style="background-color:#FFC107;color:#333333;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">Level 1 — Reminder</span></td>
+            </tr>
+        </table>
+        <h4 style="margin:20px 0 10px 0;font-size:14px;color:#1B3A5C;">Payment Instructions</h4>
+        <ul style="font-size:13px;line-height:1.8;">
+            <li><strong>Bank Transfer:</strong> SPSL Account, Dhaka Bank, A/C: 1234-5678-0012</li>
+            <li><strong>bKash:</strong> Send payment to +880-1712-345678 (Merchant)</li>
+            <li><strong>Reference:</strong> Please quote invoice number <strong>{{object.name or ''}}</strong> as payment reference</li>
+        </ul>
+        <div style="text-align:center;margin:20px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#1B3A5C;color:#FFFFFF;padding:12px 30px;border-radius:5px;text-decoration:none;font-size:14px;font-weight:bold;">
+                View Invoice &amp; Pay
+            </a>
+        </div>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">Tel: +880-2-8812345 | Email: accounts@spsl.com.bd</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">This is an automated dunning notification. Please do not reply to this email.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-011: AR Overdue Day 14 — Level 2 Dunning                  -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne011" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#FF6B6B;margin:4px 0 0 0;font-size:13px;font-weight:bold;">Urgent Payment Reminder — Level 2 Dunning</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#FFF3CD;border-left:4px solid #FFC107;padding:15px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:14px;color:#856404;"><strong>Important:</strong> This invoice is now <strong>14 days overdue</strong>. Please arrange payment immediately to avoid further action.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;margin:20px 0;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Invoice Number</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Original Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">BDT {{object.amount_total or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Outstanding Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:16px;font-weight:bold;color:#DC3545;">BDT {{object.amount_residual or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Days Overdue</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;color:#DC3545;">14 Days</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Due Date</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.invoice_date_due or ''}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Dunning Level</td>
+                <td><span style="background-color:#FD7E14;color:#FFFFFF;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">Level 2 — Urgent Reminder</span></td>
+            </tr>
+        </table>
+        <h4 style="margin:20px 0 10px 0;font-size:14px;color:#DC3545;">Payment Instructions</h4>
+        <ul style="font-size:13px;line-height:1.8;">
+            <li><strong>Bank Transfer:</strong> SPSL Account, Dhaka Bank, A/C: 1234-5678-0012</li>
+            <li><strong>bKash:</strong> Send payment to +880-1712-345678 (Merchant)</li>
+            <li><strong>Reference:</strong> Please quote invoice number <strong>{{object.name or ''}}</strong> as payment reference</li>
+        </ul>
+        <div style="background-color:#F8D7DA;border-left:4px solid #DC3545;padding:12px 20px;border-radius:4px;margin:20px 0;">
+            <p style="margin:0;font-size:13px;color:#721C24;"><strong>Notice:</strong> Continued non-payment may result in escalation to Level 3 (30 days) with additional fees and potential credit hold on your account.</p>
+        </div>
+        <div style="text-align:center;margin:20px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#DC3545;color:#FFFFFF;padding:12px 30px;border-radius:5px;text-decoration:none;font-size:14px;font-weight:bold;">
+                Pay Now
+            </a>
+        </div>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">Tel: +880-2-8812345 | Email: accounts@spsl.com.bd</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">This is an automated dunning notification. Please do not reply to this email.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-012: AR Overdue Day 30 — Level 3 Escalation               -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne012" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#FF6B6B;margin:4px 0 0 0;font-size:13px;font-weight:bold;">ESCALATION: Payment Overdue 30 Days — Level 3</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#F8D7DA;border-left:4px solid #DC3545;padding:15px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:14px;color:#721C24;"><strong>ESCALATION:</strong> This invoice is now <strong>30 days overdue</strong>. Account Manager and Sales Director have been notified. Your account may be placed on credit hold.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;margin:20px 0;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Invoice Number</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Original Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">BDT {{object.amount_total or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Outstanding Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:18px;font-weight:bold;color:#DC3545;">BDT {{object.amount_residual or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Days Overdue</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;color:#DC3545;">30 Days</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Due Date</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.invoice_date_due or ''}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Dunning Level</td>
+                <td><span style="background-color:#DC3545;color:#FFFFFF;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">Level 3 — Escalation</span></td>
+            </tr>
+        </table>
+        <div style="text-align:center;margin:20px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#DC3545;color:#FFFFFF;padding:14px 35px;border-radius:5px;text-decoration:none;font-size:16px;font-weight:bold;">
+                PAY NOW — Avoid Credit Hold
+            </a>
+        </div>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">Tel: +880-2-8812345 | Email: accounts@spsl.com.bd</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">This is an automated dunning notification. Please do not reply to this email.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-013: AR Overdue Day 45 — CRITICAL + MD Escalation          -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne013" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#7B0000;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#FF4444;margin:4px 0 0 0;font-size:14px;font-weight:bold;">CRITICAL: Payment Overdue 45 Days — MD Escalation</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#F8D7DA;border:2px solid #DC3545;padding:18px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:15px;color:#721C24;"><strong>CRITICAL ESCALATION:</strong> This invoice is now <strong>45 days overdue</strong>. The Managing Director has been notified. Legal proceedings may be initiated if payment is not received within 7 days.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;margin:20px 0;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Invoice Number</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Original Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">BDT {{object.amount_total or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Outstanding Amount</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:20px;font-weight:bold;color:#7B0000;">BDT {{object.amount_residual or '0.00'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Days Overdue</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:16px;font-weight:bold;color:#7B0000;">45 Days</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Due Date</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.invoice_date_due or ''}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Dunning Level</td>
+                <td><span style="background-color:#7B0000;color:#FFFFFF;padding:4px 12px;border-radius:3px;font-size:12px;font-weight:bold;">CRITICAL — MD Escalation</span></td>
+            </tr>
+        </table>
+        <div style="background-color:#F8D7DA;padding:15px 20px;border-radius:4px;margin:20px 0;">
+            <p style="margin:0 0 8px 0;font-size:14px;font-weight:bold;color:#721C24;">Consequences of Continued Non-Payment:</p>
+            <ul style="font-size:13px;color:#721C24;line-height:1.8;margin:0;">
+                <li>Account placed on immediate credit hold</li>
+                <li>All pending and future orders suspended</li>
+                <li>Legal recovery proceedings initiated</li>
+                <li>Reported to credit reference agencies</li>
+            </ul>
+        </div>
+        <div style="text-align:center;margin:20px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#7B0000;color:#FFFFFF;padding:14px 35px;border-radius:5px;text-decoration:none;font-size:16px;font-weight:bold;">
+                PAY IMMEDIATELY
+            </a>
+        </div>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">Tel: +880-2-8812345 | Email: accounts@spsl.com.bd</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">This is an automated dunning notification. Please do not reply to this email.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-033: SLA Response Deadline Breached — Rich HTML            -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne033" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#FF6B6B;margin:4px 0 0 0;font-size:13px;font-weight:bold;">SLA Breach Alert — Response Deadline</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#F8D7DA;border-left:4px solid #DC3545;padding:15px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:14px;color:#721C24;"><strong>SLA Response Deadline Breached</strong> — Immediate action required. SLA penalties may apply.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Ticket Number</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Customer</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.partner_id.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">SLA Tier</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.sla_tier_id.name or 'Standard'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Response Deadline</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;color:#DC3545;">{{object.sla_response_deadline or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Assigned Engineer</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.user_id.name or 'Unassigned'}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Breach Type</td>
+                <td><span style="background-color:#DC3545;color:#FFFFFF;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">Response Time Breached</span></td>
+            </tr>
+        </table>
+        <div style="text-align:center;margin:20px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#DC3545;color:#FFFFFF;padding:12px 30px;border-radius:5px;text-decoration:none;font-size:14px;font-weight:bold;">
+                View Ticket &amp; Respond
+            </a>
+        </div>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">Automated SLA monitoring notification.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-035: SLA Resolution Deadline Breached — Rich HTML          -->
+    <!-- ============================================================ -->
+    <record id="notification_event_ne035" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#7B0000;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">Smart Printing Solution Ltd.</h2>
+            <p style="color:#FF4444;margin:4px 0 0 0;font-size:14px;font-weight:bold;">CRITICAL: SLA Resolution Breach — Operations Director Escalation</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#F8D7DA;border:2px solid #DC3545;padding:18px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:15px;color:#721C24;"><strong>CRITICAL:</strong> SLA resolution deadline has been breached. This has been escalated to the Operations Director. SLA penalties will apply.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Ticket Number</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Customer</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.partner_id.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">SLA Tier</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.sla_tier_id.name or 'Standard'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Resolution Deadline</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;color:#7B0000;">{{object.sla_resolution_deadline or ''}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Assigned Engineer</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.user_id.name or 'Unassigned'}}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Field Supervisor</td>
+                <td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.supervisor_id.name or ''}}</td>
+            </tr>
+            <tr>
+                <td style="color:#6C757D;font-size:13px;">Escalation</td>
+                <td><span style="background-color:#7B0000;color:#FFFFFF;padding:4px 12px;border-radius:3px;font-size:12px;font-weight:bold;">Operations Director Notified</span></td>
+            </tr>
+        </table>
+        <div style="background-color:#F8D7DA;padding:15px 20px;border-radius:4px;margin:20px 0;">
+            <p style="margin:0 0 8px 0;font-size:14px;font-weight:bold;color:#721C24;">Required Actions:</p>
+            <ul style="font-size:13px;color:#721C24;line-height:1.8;margin:0;">
+                <li>Assign additional engineer if needed for faster resolution</li>
+                <li>Contact customer with updated ETA</li>
+                <li>Document root cause of breach for SLA review</li>
+                <li>Prepare SLA penalty calculation for Finance</li>
+            </ul>
+        </div>
+        <div style="text-align:center;margin:20px 0;">
+            <a href="{{object.access_url or '#'}}" style="background-color:#7B0000;color:#FFFFFF;padding:14px 35px;border-radius:5px;text-decoration:none;font-size:16px;font-weight:bold;">
+                View Ticket &amp; Resolve
+            </a>
+        </div>
+    </td></tr>
+    <tr><td style="padding:0;">
+        <div style="background-color:#F4F6F8;padding:20px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;">
+            <p style="color:#6C757D;font-size:12px;margin:0 0 8px 0;"><strong>Smart Printing Solution Ltd.</strong></p>
+            <p style="color:#6C757D;font-size:11px;margin:0 0 4px 0;">House 12, Road 27, Gulshan-1, Dhaka 1212, Bangladesh</p>
+            <p style="color:#ADB5BD;font-size:10px;margin:8px 0 0 0;">Automated SLA monitoring notification.</p>
+        </div>
+    </td></tr>
+</table>
+]]></field>
+    </record>
+
+
+    <!-- ============================================================ -->
+    <!-- NE-050 to NE-056: System Alert Templates — Rich HTML          -->
+    <!-- ============================================================ -->
+
+    <!-- NE-050: Failed login -->
+    <record id="notification_event_ne050" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">SPSL ERP System</h2>
+            <p style="color:#FFC107;margin:4px 0 0 0;font-size:13px;font-weight:bold;">Security Alert: Failed Login Attempts</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr><td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Alert Type</td><td style="border-bottom:1px solid #DEE2E6;"><span style="background-color:#FFC107;color:#333;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">Security — Failed Login</span></td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Timestamp</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.login_date or ''}}</td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Affected User</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.login or ''}}</td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Source IP</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.login_ip or 'Unknown'}}</td></tr>
+            <tr><td style="color:#6C757D;font-size:13px;">Recommended Action</td><td style="font-size:14px;">Investigate IP. Consider account lockout if pattern continues.</td></tr>
+        </table>
+    </td></tr>
+    <tr><td style="padding:0;"><div style="background-color:#F4F6F8;padding:15px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;"><p style="color:#ADB5BD;font-size:10px;margin:0;">SPSL ERP Automated Monitoring</p></div></td></tr>
+</table>
+]]></field>
+    </record>
+
+    <!-- NE-052: Backup job failed -->
+    <record id="notification_event_ne052" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#7B0000;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">SPSL ERP System</h2>
+            <p style="color:#FF4444;margin:4px 0 0 0;font-size:13px;font-weight:bold;">CRITICAL: Backup Job Failed</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#F8D7DA;border-left:4px solid #DC3545;padding:15px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:14px;color:#721C24;"><strong>Database backup has failed.</strong> Disaster recovery is at risk. Investigate immediately and re-trigger backup manually.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr><td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Alert Type</td><td style="border-bottom:1px solid #DEE2E6;"><span style="background-color:#DC3545;color:#FFF;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">CRITICAL — Backup Failure</span></td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Timestamp</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.create_date or ''}}</td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Affected Component</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;">Database Backup System</td></tr>
+            <tr><td style="color:#6C757D;font-size:13px;">Recommended Action</td><td style="font-size:14px;">1. Check disk space. 2. Check backup logs. 3. Re-trigger backup. 4. Verify backup integrity.</td></tr>
+        </table>
+    </td></tr>
+    <tr><td style="padding:0;"><div style="background-color:#F4F6F8;padding:15px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;"><p style="color:#ADB5BD;font-size:10px;margin:0;">SPSL ERP Automated Monitoring — Do not ignore this alert.</p></div></td></tr>
+</table>
+]]></field>
+    </record>
+
+    <!-- NE-053: Server disk usage > 80% -->
+    <record id="notification_event_ne053" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">SPSL ERP System</h2>
+            <p style="color:#FFC107;margin:4px 0 0 0;font-size:13px;font-weight:bold;">Disk Space Warning</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr><td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Alert Type</td><td style="border-bottom:1px solid #DEE2E6;"><span style="background-color:#FFC107;color:#333;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">Warning — Disk Usage &gt; 80%</span></td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Timestamp</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.create_date or ''}}</td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Affected Component</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;">Server Filesystem</td></tr>
+            <tr><td style="color:#6C757D;font-size:13px;">Recommended Action</td><td style="font-size:14px;">1. Check disk usage with df -h. 2. Clean old logs/tmp files. 3. If &gt;90%, SMS alert will fire.</td></tr>
+        </table>
+    </td></tr>
+    <tr><td style="padding:0;"><div style="background-color:#F4F6F8;padding:15px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;"><p style="color:#ADB5BD;font-size:10px;margin:0;">SPSL ERP Automated Monitoring</p></div></td></tr>
+</table>
+]]></field>
+    </record>
+
+    <!-- NE-055: Scheduled batch job failed -->
+    <record id="notification_event_ne055" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">SPSL ERP System</h2>
+            <p style="color:#FF6B6B;margin:4px 0 0 0;font-size:13px;font-weight:bold;">Scheduled Job Failed</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#FFF3CD;border-left:4px solid #FFC107;padding:15px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:14px;color:#856404;">A scheduled batch job has failed. Please investigate and re-trigger after resolving the issue.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr><td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Alert Type</td><td style="border-bottom:1px solid #DEE2E6;"><span style="background-color:#FD7E14;color:#FFF;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">Job Failure</span></td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Job Name</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Timestamp</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.nextcall or ''}}</td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Affected Component</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;">Cron / Scheduled Actions</td></tr>
+            <tr><td style="color:#6C757D;font-size:13px;">Recommended Action</td><td style="font-size:14px;">1. Check job logs for error. 2. Fix root cause. 3. Re-trigger manually from Settings &gt; Technical &gt; Scheduled Actions.</td></tr>
+        </table>
+    </td></tr>
+    <tr><td style="padding:0;"><div style="background-color:#F4F6F8;padding:15px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;"><p style="color:#ADB5BD;font-size:10px;margin:0;">SPSL ERP Automated Monitoring</p></div></td></tr>
+</table>
+]]></field>
+    </record>
+
+    <!-- NE-056: API integration error -->
+    <record id="notification_event_ne056" model="spsl.notification.template">
+        <field name="body_template"><![CDATA[
+<table width="100%" cellspacing="0" cellpadding="0" style="font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <tr><td style="padding:0;">
+        <div style="background-color:#1B3A5C;padding:20px 30px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#FFFFFF;margin:0;font-size:20px;">SPSL ERP System</h2>
+            <p style="color:#FF6B6B;margin:4px 0 0 0;font-size:13px;font-weight:bold;">API Integration Error</p>
+        </div>
+    </td></tr>
+    <tr><td style="padding:25px 30px;background-color:#FFFFFF;">
+        <div style="background-color:#F8D7DA;border-left:4px solid #DC3545;padding:15px 20px;border-radius:4px;margin:0 0 20px 0;">
+            <p style="margin:0;font-size:14px;color:#721C24;">An external API integration has encountered an error. If 3 consecutive errors occur, an SMS will be sent to the CFO.</p>
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="12" style="border:1px solid #DEE2E6;border-radius:6px;background-color:#F8F9FA;">
+            <tr><td style="border-bottom:1px solid #DEE2E6;width:40%;color:#6C757D;font-size:13px;">Alert Type</td><td style="border-bottom:1px solid #DEE2E6;"><span style="background-color:#DC3545;color:#FFF;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:bold;">Integration Error</span></td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Integration</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;font-weight:bold;">{{object.name or ''}}</td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Timestamp</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;">{{object.create_date or ''}}</td></tr>
+            <tr><td style="border-bottom:1px solid #DEE2E6;color:#6C757D;font-size:13px;">Error Detail</td><td style="border-bottom:1px solid #DEE2E6;font-size:14px;color:#DC3545;">{{object.error_message or 'Unknown error'}}</td></tr>
+            <tr><td style="color:#6C757D;font-size:13px;">Recommended Action</td><td style="font-size:14px;">1. Check API credentials. 2. Verify endpoint status. 3. Check network connectivity. 4. Retry manually if resolved.</td></tr>
+        </table>
+    </td></tr>
+    <tr><td style="padding:0;"><div style="background-color:#F4F6F8;padding:15px 30px;border-top:1px solid #DEE2E6;border-radius:0 0 8px 8px;"><p style="color:#ADB5BD;font-size:10px;margin:0;">SPSL ERP Automated Monitoring</p></div></td></tr>
+</table>
+]]></field>
+    </record>
+
+</odoo>

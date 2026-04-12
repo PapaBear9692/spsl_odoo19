@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================================ -->
+        <!-- Budget & Finance Events (NE-060 to NE-064)                    -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-060: Budget Threshold 80% — MANDATORY -->
+        <record id="notification_event_ne060" model="spsl.notification.template">
+            <field name="event_code">NE-060</field>
+            <field name="name">Budget Threshold 80%</field>
+            <field name="description">Triggered when a budget utilization reaches 80%. Notifies Budget Owner and CFO. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Budget Alert: 80% Utilized — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Budget Threshold Alert</strong></p>
+<p>A budget has reached <strong>80% utilization</strong>:</p>
+<ul>
+<li><strong>Budget:</strong> {{object.name or ''}}</li>
+<li><strong>Department:</strong> {{object.department_id.name or ''}}</li>
+<li><strong>Budget Amount:</strong> {{object.planned_amount or '0.00'}}</li>
+<li><strong>Utilized:</strong> {{object.practical_amount or '0.00'}}</li>
+</ul>
+<p>Please review spending and plan the remainder of the period carefully.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+        <!-- NE-061: Budget Exceeded -->
+        <record id="notification_event_ne061" model="spsl.notification.template">
+            <field name="event_code">NE-061</field>
+            <field name="name">Budget Exceeded</field>
+            <field name="description">Triggered when a budget is fully exceeded. Notifies Budget Owner, CFO, and MD.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Budget Exceeded — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Budget Exceeded</strong></p>
+<p>A budget has been exceeded:</p>
+<ul>
+<li><strong>Budget:</strong> {{object.name or ''}}</li>
+<li><strong>Department:</strong> {{object.department_id.name or ''}}</li>
+<li><strong>Budget Amount:</strong> {{object.planned_amount or '0.00'}}</li>
+<li><strong>Actual Spending:</strong> {{object.practical_amount or '0.00'}}</li>
+</ul>
+<p>Any further spending requires additional approval from the CFO and MD.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_md"/>
+        </record>
+
+        <!-- NE-062: Month-End Close Initiated -->
+        <record id="notification_event_ne062" model="spsl.notification.template">
+            <field name="event_code">NE-062</field>
+            <field name="name">Month-End Close Initiated</field>
+            <field name="description">Triggered when the month-end closing process is initiated. Notifies all Finance users.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Month-End Close Initiated — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Month-End Close Initiated</strong></p>
+<p>The month-end closing process has been initiated for period:</p>
+<ul>
+<li><strong>Period:</strong> {{object.name or ''}}</li>
+<li><strong>Initiated By:</strong> {{object.write_uid.name or ''}}</li>
+</ul>
+<p>All finance users must complete their pending entries before the close deadline.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_finance_manager"/>
+        </record>
+
+        <!-- NE-063: Month-End Close Completed -->
+        <record id="notification_event_ne063" model="spsl.notification.template">
+            <field name="event_code">NE-063</field>
+            <field name="name">Month-End Close Completed</field>
+            <field name="description">Triggered when the month-end closing process is completed. Notifies CFO.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Month-End Close Completed — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Month-End Close Completed</strong></p>
+<p>The month-end closing process has been completed:</p>
+<ul>
+<li><strong>Period:</strong> {{object.name or ''}}</li>
+<li><strong>Completed By:</strong> {{object.write_uid.name or ''}}</li>
+</ul>
+<p>Financial reports for this period are now ready for review.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+        <!-- NE-064: Payroll Batch Ready -->
+        <record id="notification_event_ne064" model="spsl.notification.template">
+            <field name="event_code">NE-064</field>
+            <field name="name">Payroll Batch Ready</field>
+            <field name="description">Triggered when a payroll batch is computed and ready for review. Notifies Payroll Officer and HR Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Payroll Batch Ready — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A payroll batch has been computed and is ready for review:</p>
+<ul>
+<li><strong>Batch:</strong> {{object.name or ''}}</li>
+<li><strong>Period:</strong> {{object.period_id.name or ''}}</li>
+<li><strong>Employee Count:</strong> {{object.slip_count or '0'}}</li>
+</ul>
+<p>Please review the payslips and approve the batch for processing.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.spsl_core_group_manager"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- HR / Employee Events (NE-065 to NE-068)                       -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-065: Payslip Published -->
+        <record id="notification_event_ne065" model="spsl.notification.template">
+            <field name="event_code">NE-065</field>
+            <field name="name">Payslip Published</field>
+            <field name="description">Triggered when a payslip is published. Sends email to the employee with payslip details.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">Payslip for {{object.period_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.employee_id.name or ''}},</p>
+<p>Your payslip for <strong>{{object.period_id.name or ''}}</strong> is now available.</p>
+<p>Please find the attached payslip PDF for your records.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+        </record>
+
+        <!-- NE-066: Leave Request Submitted -->
+        <record id="notification_event_ne066" model="spsl.notification.template">
+            <field name="event_code">NE-066</field>
+            <field name="name">Leave Request Submitted</field>
+            <field name="description">Triggered when an employee submits a leave request. Notifies the employee's manager via in-app.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">Leave Request — {{object.employee_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A leave request has been submitted:</p>
+<ul>
+<li><strong>Employee:</strong> {{object.employee_id.name or ''}}</li>
+<li><strong>Leave Type:</strong> {{object.holiday_status_id.name or ''}}</li>
+<li><strong>From:</strong> {{object.date_from or ''}}</li>
+<li><strong>To:</strong> {{object.date_to or ''}}</li>
+<li><strong>Duration:</strong> {{object.number_of_days or '0'}} days</li>
+</ul>
+<p>Please approve or reject this request.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+        </record>
+
+        <!-- NE-067: Leave Approved/Rejected -->
+        <record id="notification_event_ne067" model="spsl.notification.template">
+            <field name="event_code">NE-067</field>
+            <field name="name">Leave Approved/Rejected</field>
+            <field name="description">Triggered when a leave request is approved or rejected. Notifies the employee via email and in-app.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">Leave Request Update — {{object.employee_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.employee_id.name or ''}},</p>
+<p>Your leave request has been updated:</p>
+<ul>
+<li><strong>Leave Type:</strong> {{object.holiday_status_id.name or ''}}</li>
+<li><strong>From:</strong> {{object.date_from or ''}}</li>
+<li><strong>To:</strong> {{object.date_to or ''}}</li>
+<li><strong>Status:</strong> {{object.state or ''}}</li>
+</ul>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+        </record>
+
+        <!-- NE-068: MPS Meter Reading Due -->
+        <record id="notification_event_ne068" model="spsl.notification.template">
+            <field name="event_code">NE-068</field>
+            <field name="name">MPS Meter Reading Due</field>
+            <field name="description">Triggered at the start of each month to remind that meter readings are due. Notifies MPS Coordinator via email and SMS.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Meter Readings Due — Monthly Reminder</field>
+            <field name="body_template"><![CDATA[<p><strong>MPS Meter Reading Reminder</strong></p>
+<p>Monthly meter readings are now due. Please ensure all customer meter readings are collected and entered into the system by the 3rd of the month.</p>
+<p>Devices without readings after Day 3 will trigger follow-up notifications to customers.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_sms'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- MPS Billing Events (NE-069 to NE-070)                         -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-069: MPS Billing Batch Started -->
+        <record id="notification_event_ne069" model="spsl.notification.template">
+            <field name="event_code">NE-069</field>
+            <field name="name">MPS Billing Batch Started</field>
+            <field name="description">Triggered when the MPS monthly billing batch run starts. Notifies MPS Manager and Finance Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">MPS Billing Batch Started</field>
+            <field name="body_template"><![CDATA[<p><strong>MPS Monthly Billing Batch Started</strong></p>
+<p>The MPS monthly billing batch run has been initiated:</p>
+<ul>
+<li><strong>Period:</strong> {{object.period_id.name or ''}}</li>
+<li><strong>Started By:</strong> {{object.create_uid.name or ''}}</li>
+</ul>
+<p>Progress will be logged. A completion notification will be sent when all invoices are generated.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_sales_director"/>
+        </record>
+
+        <!-- NE-070: MPS Billing Batch Completed -->
+        <record id="notification_event_ne070" model="spsl.notification.template">
+            <field name="event_code">NE-070</field>
+            <field name="name">MPS Billing Batch Completed</field>
+            <field name="description">Triggered when the MPS monthly billing batch run completes. Notifies MPS Manager and CFO.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">MPS Billing Batch Completed</field>
+            <field name="body_template"><![CDATA[<p><strong>MPS Monthly Billing Batch Completed</strong></p>
+<p>The MPS monthly billing batch run has completed:</p>
+<ul>
+<li><strong>Period:</strong> {{object.period_id.name or ''}}</li>
+<li><strong>Invoices Generated:</strong> {{object.slip_count or '0'}}</li>
+</ul>
+<p>Please review the generated invoices before confirming.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Field Engineer / SLA Events (NE-071 to NE-076)                -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-071: Service Ticket Created -->
+        <record id="notification_event_ne071" model="spsl.notification.template">
+            <field name="event_code">NE-071</field>
+            <field name="name">Service Ticket Created</field>
+            <field name="description">Triggered when a new service ticket is created. Notifies the assigned field engineer via email, in-app, and push notification.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">New Service Ticket — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A new service ticket has been assigned to you:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Device:</strong> {{object.product_id.name or ''}}</li>
+<li><strong>Priority:</strong> {{object.priority or 'Normal'}}</li>
+</ul>
+<p>Please acknowledge and plan your visit.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app')), (4, ref('spsl_core.channel_push'))]"/>
+        </record>
+
+        <!-- NE-072: SLA Warning — Response Time 80% — MANDATORY -->
+        <record id="notification_event_ne072" model="spsl.notification.template">
+            <field name="event_code">NE-072</field>
+            <field name="name">SLA Warning — Response Time 80%</field>
+            <field name="description">Triggered when SLA response time reaches 80% of the allowed duration. Notifies Field Engineer and Field Supervisor. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">SLA Response Warning — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>SLA Response Time Warning (80%)</strong></p>
+<p>Response time for this ticket has reached 80% of the SLA limit:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+</ul>
+<p>Please respond immediately to avoid an SLA breach.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app')), (4, ref('spsl_core.channel_push'))]"/>
+        </record>
+
+        <!-- NE-073: SLA Warning — Resolution Time 80% -->
+        <record id="notification_event_ne073" model="spsl.notification.template">
+            <field name="event_code">NE-073</field>
+            <field name="name">SLA Warning — Resolution Time 80%</field>
+            <field name="description">Triggered when SLA resolution time reaches 80% of the allowed duration. Notifies Field Supervisor and Operations Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">SLA Resolution Warning — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>SLA Resolution Time Warning (80%)</strong></p>
+<p>Resolution time for this ticket has reached 80% of the SLA limit:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Assigned Engineer:</strong> {{object.user_id.name or ''}}</li>
+</ul>
+<p>Please ensure the engineer is progressing toward resolution.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app')), (4, ref('spsl_core.channel_push'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-074: SLA Breached — MANDATORY -->
+        <record id="notification_event_ne074" model="spsl.notification.template">
+            <field name="event_code">NE-074</field>
+            <field name="name">SLA Breached</field>
+            <field name="description">Triggered when an SLA is breached. Notifies Field Supervisor, Operations Manager, and MD. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">CRITICAL: SLA Breached — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>CRITICAL: SLA Breached</strong></p>
+<p>An SLA has been breached:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Assigned Engineer:</strong> {{object.user_id.name or ''}}</li>
+</ul>
+<p>SLA penalty may apply. Immediate corrective action is required. The MD has been notified.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app')), (4, ref('spsl_core.channel_sms'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_md"/>
+        </record>
+
+        <!-- NE-075: Parts Request Submitted -->
+        <record id="notification_event_ne075" model="spsl.notification.template">
+            <field name="event_code">NE-075</field>
+            <field name="name">Parts Request Submitted</field>
+            <field name="description">Triggered when a field engineer submits a parts requisition. Notifies Inventory Manager via in-app.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Parts Request — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A parts requisition has been submitted:</p>
+<ul>
+<li><strong>Request:</strong> {{object.name or ''}}</li>
+<li><strong>Requested By:</strong> {{object.user_id.name or ''}}</li>
+<li><strong>Service Ticket:</strong> {{object.origin or ''}}</li>
+</ul>
+<p>Please review and approve or reject the requisition.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-076: Parts Request Approved -->
+        <record id="notification_event_ne076" model="spsl.notification.template">
+            <field name="event_code">NE-076</field>
+            <field name="name">Parts Request Approved</field>
+            <field name="description">Triggered when a parts requisition is approved. Notifies the field engineer via push notification.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">Parts Approved — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Your parts requisition has been approved:</p>
+<ul>
+<li><strong>Request:</strong> {{object.name or ''}}</li>
+</ul>
+<p>Please collect the parts and proceed with the service visit.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_push'))]"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Job Card & Asset Events (NE-077 to NE-079)                    -->
+        <!--                                                                -->
+        <!-- ============================================================ -->
+
+        <!-- NE-077: Job Card Completed -->
+        <record id="notification_event_ne077" model="spsl.notification.template">
+            <field name="event_code">NE-077</field>
+            <field name="name">Job Card Completed</field>
+            <field name="description">Triggered when a field engineer completes a job card. Notifies the customer and Field Supervisor via email and in-app.</field>
+            <field name="recipient_type">document_follower</field>
+            <field name="subject_template">Service Completed — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.partner_id.name or 'Customer'}},</p>
+<p>Your service request has been completed:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Engineer:</strong> {{object.user_id.name or ''}}</li>
+<li><strong>Completed On:</strong> {{object.date_finished or ''}}</li>
+</ul>
+<p>If you have any concerns, please contact our support team.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+        </record>
+
+        <!-- NE-078: Asset Deployed -->
+        <record id="notification_event_ne078" model="spsl.notification.template">
+            <field name="event_code">NE-078</field>
+            <field name="name">Asset Deployed</field>
+            <field name="description">Triggered when an asset (printer/copier) is deployed to a customer site. Notifies Asset Manager and MPS Manager via in-app.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Asset Deployed — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Asset Deployed</strong></p>
+<ul>
+<li><strong>Asset:</strong> {{object.name or ''}}</li>
+<li><strong>Product:</strong> {{object.product_id.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Location:</strong> {{object.location_id.name or ''}}</li>
+</ul>
+<p>The asset has been deployed to the customer site.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_sales_director"/>
+        </record>
+
+        <!-- NE-079: Asset Returned -->
+        <record id="notification_event_ne079" model="spsl.notification.template">
+            <field name="event_code">NE-079</field>
+            <field name="name">Asset Returned</field>
+            <field name="description">Triggered when an asset is returned from a customer site. Notifies Asset Manager and Inventory Manager via in-app.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Asset Returned — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Asset Returned</strong></p>
+<ul>
+<li><strong>Asset:</strong> {{object.name or ''}}</li>
+<li><strong>Product:</strong> {{object.product_id.name or ''}}</li>
+<li><strong>Returned From:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Current Location:</strong> {{object.location_id.name or ''}}</li>
+</ul>
+<p>Please inspect the asset and update its condition in the system.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+    </data>
+</odoo>

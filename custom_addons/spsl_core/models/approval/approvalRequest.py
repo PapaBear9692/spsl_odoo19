@@ -319,19 +319,20 @@ class ApprovalRequest(models.Model):
     # ---------------------------------------------------------------
     def _log_maker_checker_violation(self, user):
         """Log a maker-checker violation attempt to the audit trail."""
-        self.env['spsl.audit.log'].sudo().create({
-            'model_name': self._name,
-            'res_id': self.id,
-            'operation': 'maker_checker_violation',
-            'user_id': user.id,
-            'old_values': False,
-            'new_values': str({
+        self.env['spsl.audit.log'].sudo()._log_action(
+            model_name=self._name,
+            record_id=self.id,
+            action='write',
+            record_name=self.name,
+            field_changes='maker_checker_violation',
+            old_values='',
+            new_values=str({
                 'requested_by': self.requested_by.name,
                 'attempted_approver': user.name,
                 'request_ref': self.name,
                 'rule': 'GB-006 Maker-Checker Principle',
             }),
-        })
+        )
 
     # ---------------------------------------------------------------
     # CRUD
@@ -607,22 +608,23 @@ class ApprovalRequest(models.Model):
     def _log_escalation(self, next_tier):
         """Log the escalation event in the audit trail."""
         self.ensure_one()
-        self.env['spsl.audit.log'].sudo().create({
-            'model_name': self._name,
-            'res_id': self.id,
-            'operation': 'auto_escalation',
-            'user_id': self.env.user.id,
-            'old_values': str({
+        self.env['spsl.audit.log'].sudo()._log_action(
+            model_name=self._name,
+            record_id=self.id,
+            action='write',
+            record_name=self.name,
+            field_changes='rule_line_id, escalated',
+            old_values=str({
                 'rule_line_id': self.rule_line_id.id if self.rule_line_id else False,
                 'escalated': False,
             }),
-            'new_values': str({
+            new_values=str({
                 'rule_line_id': next_tier.id if next_tier else False,
                 'escalated': True,
                 'escalation_date': str(fields.Datetime.now()),
                 'next_tier_name': next_tier.rule_id.name if next_tier else 'System Administrator (no higher tier)',
             }),
-        })
+        )
 
     # ---------------------------------------------------------------
     # Cron: Approval reminders (NE-reminder-24h / NE-reminder-48h)

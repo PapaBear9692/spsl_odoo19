@@ -17,21 +17,14 @@ class NotificationMixin(models.AbstractModel):
         copy=False,
     )
 
-    def _send_notification(self, event_code, template_code, context=None):
+    def _send_notification(self, event_code, template_code=None, context=None):
         self.ensure_one()
-        event = self.env['spsl.notification.event'].search([
-            ('code', '=', event_code),
-            ('active', '=', True),
-        ], limit=1)
-        if not event:
-            return False
         template = self.env['spsl.notification.template'].search([
-            ('code', '=', template_code),
-            ('event_id', '=', event.id),
+            ('event_code', '=', event_code),
             ('active', '=', True),
         ], limit=1)
         if not template:
             return False
-        return self.env['spsl.notification.log']._dispatch_notification(
-            self, event, template, context or {}
+        return self.env['spsl.notification.dispatcher'].dispatch(
+            event_code, self, context or {}
         )

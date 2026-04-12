@@ -145,4 +145,10 @@
               action="action_spsl_notification_channel"
               sequence="20"/>
 
+    <menuitem id="menu_spsl_notification_log"
+              name="Notification Logs"
+              parent="menu_spsl_notification_root"
+              action="action_spsl_notification_log"
+              sequence="30"/>
+
 </odoo>

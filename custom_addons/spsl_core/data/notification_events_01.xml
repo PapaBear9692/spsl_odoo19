@@ -1,0 +1,932 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================================ -->
+        <!-- Module: MPS (NE-001 to NE-006)                                -->
+        <!-- BRD_12 §2.2 — Notification Event Catalog                      -->
+        <!-- ============================================================ -->
+
+        <!-- NE-001: MPS invoice generated -->
+        <record id="notification_event_ne001" model="spsl.notification.template">
+            <field name="event_code">NE-001</field>
+            <field name="name">MPS Invoice Generated</field>
+            <field name="description">Triggered when an MPS invoice is generated. Sent to the customer billing contact.</field>
+            <field name="recipient_type">document_follower</field>
+            <field name="subject_template">Invoice {{object.name or ''}} from SPSL</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.partner_id.name or 'Customer'}},</p>
+<p>Your invoice has been generated:</p>
+<ul>
+<li><strong>Invoice:</strong> {{object.name or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount_total or '0.00'}}</li>
+<li><strong>Due Date:</strong> {{object.invoice_date_due or ''}}</li>
+</ul>
+<p>Please arrange payment by the due date.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+        </record>
+
+        <!-- NE-002: Meter reading not received by Day 3 of month -->
+        <record id="notification_event_ne002" model="spsl.notification.template">
+            <field name="event_code">NE-002</field>
+            <field name="name">Meter Reading Not Received (Day 3)</field>
+            <field name="description">Triggered on Day 3 of the month when a customer meter reading has not been received. Escalates to MPS Coordinator on Day 5.</field>
+            <field name="recipient_type">document_follower</field>
+            <field name="subject_template">Meter Reading Pending — {{object.partner_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.partner_id.name or 'Customer'}},</p>
+<p>We have not yet received your meter reading for this month. Please submit your meter reading at your earliest convenience.</p>
+<p>If you need assistance, please contact your Account Manager.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_sms'))]"/>
+            <field name="escalation_delay_hours">48</field>
+        </record>
+
+        <!-- NE-003: MPS contract expiry in 90 days -->
+        <record id="notification_event_ne003" model="spsl.notification.template">
+            <field name="event_code">NE-003</field>
+            <field name="name">MPS Contract Expiry in 90 Days</field>
+            <field name="description">Early warning that an MPS contract expires in 90 days. Notifies Account Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Contract Expiry in 90 Days — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>An MPS contract is approaching its expiry date in <strong>90 days</strong>:</p>
+<ul>
+<li><strong>Contract:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>End Date:</strong> {{object.date_end or ''}}</li>
+</ul>
+<p>Please initiate renewal discussions with the customer.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_sales_director"/>
+        </record>
+
+        <!-- NE-004: MPS contract expiry in 30 days -->
+        <record id="notification_event_ne004" model="spsl.notification.template">
+            <field name="event_code">NE-004</field>
+            <field name="name">MPS Contract Expiry in 30 Days</field>
+            <field name="description">Urgent — MPS contract expires in 30 days. Notifies Account Manager and MPS Manager. Escalates to Sales Director at Day 15.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">URGENT: Contract Expiry in 30 Days — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>URGENT:</strong> An MPS contract is expiring in <strong>30 days</strong>:</p>
+<ul>
+<li><strong>Contract:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>End Date:</strong> {{object.date_end or ''}}</li>
+</ul>
+<p>Immediate action is required to secure contract renewal.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_sms'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_sales_director"/>
+            <field name="escalation_delay_hours">360</field>
+        </record>
+
+        <!-- NE-005: MPS contract expired (no renewal) -->
+        <record id="notification_event_ne005" model="spsl.notification.template">
+            <field name="event_code">NE-005</field>
+            <field name="name">MPS Contract Expired (No Renewal)</field>
+            <field name="description">Triggered when an MPS contract expires without renewal. Notifies MPS Manager and Sales Director.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Contract Expired — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Contract Expired Without Renewal</strong></p>
+<ul>
+<li><strong>Contract:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Expired On:</strong> {{object.date_end or ''}}</li>
+</ul>
+<p>Please follow up with the customer immediately regarding contract renewal or equipment recovery.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_sales_director"/>
+        </record>
+
+        <!-- NE-006: Disputed click record submitted -->
+        <record id="notification_event_ne006" model="spsl.notification.template">
+            <field name="event_code">NE-006</field>
+            <field name="name">Disputed Click Record Submitted</field>
+            <field name="description">Triggered when a customer disputes a click/meter reading record. Notifies MPS Manager and Finance Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Click Record Disputed — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A click/meter reading record has been disputed:</p>
+<ul>
+<li><strong>Record:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Device:</strong> {{object.product_id.name or ''}}</li>
+</ul>
+<p>Please review the disputed record and take appropriate action.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_finance_manager"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Module: AR / Finance (NE-010 to NE-021)                       -->
+        <!-- BRD_12 §2.2 — Notification Event Catalog                      -->
+        <!-- ============================================================ -->
+
+        <!-- NE-010: AR overdue Day 7 -->
+        <record id="notification_event_ne010" model="spsl.notification.template">
+            <field name="event_code">NE-010</field>
+            <field name="name">AR Overdue Day 7</field>
+            <field name="description">Accounts receivable overdue by 7 days. Level 1 dunning email to customer billing contact.</field>
+            <field name="recipient_type">document_follower</field>
+            <field name="subject_template">Payment Reminder — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.partner_id.name or 'Customer'}},</p>
+<p>This is a reminder that your invoice payment is now <strong>7 days overdue</strong>:</p>
+<ul>
+<li><strong>Invoice:</strong> {{object.name or ''}}</li>
+<li><strong>Amount Due:</strong> {{object.amount_residual or '0.00'}}</li>
+<li><strong>Due Date:</strong> {{object.invoice_date_due or ''}}</li>
+</ul>
+<p>Please arrange payment at your earliest convenience.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+        </record>
+
+        <!-- NE-011: AR overdue Day 14 -->
+        <record id="notification_event_ne011" model="spsl.notification.template">
+            <field name="event_code">NE-011</field>
+            <field name="name">AR Overdue Day 14</field>
+            <field name="description">Accounts receivable overdue by 14 days. Level 2 dunning — Email + SMS to customer billing contact.</field>
+            <field name="recipient_type">document_follower</field>
+            <field name="subject_template">Payment Overdue 14 Days — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.partner_id.name or 'Customer'}},</p>
+<p>This is an <strong>urgent reminder</strong> that your invoice payment is now <strong>14 days overdue</strong>:</p>
+<ul>
+<li><strong>Invoice:</strong> {{object.name or ''}}</li>
+<li><strong>Amount Due:</strong> {{object.amount_residual or '0.00'}}</li>
+<li><strong>Due Date:</strong> {{object.invoice_date_due or ''}}</li>
+</ul>
+<p>Please arrange payment immediately to avoid further action.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_sms'))]"/>
+        </record>
+
+        <!-- NE-012: AR overdue Day 30 -->
+        <record id="notification_event_ne012" model="spsl.notification.template">
+            <field name="event_code">NE-012</field>
+            <field name="name">AR Overdue Day 30</field>
+            <field name="description">Accounts receivable overdue by 30 days. Level 3 — Email + SMS to Customer and Account Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">ESCALATION: Payment Overdue 30 Days — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>ESCALATION:</strong> An invoice is now <strong>30 days overdue</strong>:</p>
+<ul>
+<li><strong>Invoice:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Amount Due:</strong> {{object.amount_residual or '0.00'}}</li>
+<li><strong>Due Date:</strong> {{object.invoice_date_due or ''}}</li>
+</ul>
+<p>Account Manager intervention required. Please follow up with the customer immediately.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_sms'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_sales_director"/>
+        </record>
+
+        <!-- NE-013: AR overdue Day 45 — MANDATORY -->
+        <record id="notification_event_ne013" model="spsl.notification.template">
+            <field name="event_code">NE-013</field>
+            <field name="name">AR Overdue Day 45</field>
+            <field name="description">Critical — AR overdue 45 days. Email + Phone call required. Customer + Account Manager + Sales Director notified. Escalates to MD. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">CRITICAL: Payment Overdue 45 Days — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>CRITICAL ESCALATION:</strong> An invoice is now <strong>45 days overdue</strong>:</p>
+<ul>
+<li><strong>Invoice:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Amount Due:</strong> {{object.amount_residual or '0.00'}}</li>
+<li><strong>Due Date:</strong> {{object.invoice_date_due or ''}}</li>
+</ul>
+<p>A phone call to the customer is required. If payment is not received within 7 days, legal proceedings may be initiated. MD has been notified.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_sms')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_md"/>
+            <field name="escalation_delay_hours">24</field>
+        </record>
+
+        <!-- NE-014: Cash remittance not recorded by 4 PM — MANDATORY -->
+        <record id="notification_event_ne014" model="spsl.notification.template">
+            <field name="event_code">NE-014</field>
+            <field name="name">Cash Remittance Not Recorded by 4 PM</field>
+            <field name="description">Triggered at 4 PM when a branch has not recorded its daily cash remittance. Notifies Branch Manager. Escalates to Finance Manager at 5 PM. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Cash Remittance Not Recorded — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Cash Remittance Alert</strong></p>
+<p>The daily cash remittance has not been recorded by 4 PM:</p>
+<ul>
+<li><strong>Branch:</strong> {{object.name or ''}}</li>
+<li><strong>Date:</strong> {{object.date or ''}}</li>
+</ul>
+<p>Please record the cash remittance immediately. This will escalate to Finance Manager at 5 PM if not resolved.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_sms')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_branch_manager"/>
+            <field name="escalation_delay_hours">1</field>
+        </record>
+
+        <!-- NE-015: Cash remittance variance detected — MANDATORY -->
+        <record id="notification_event_ne015" model="spsl.notification.template">
+            <field name="event_code">NE-015</field>
+            <field name="name">Cash Remittance Variance Detected</field>
+            <field name="description">Triggered when a variance is detected between expected and actual cash remittance. Notifies CFO and Finance Manager. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Cash Remittance Variance — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Cash Remittance Variance Detected</strong></p>
+<ul>
+<li><strong>Record:</strong> {{object.name or ''}}</li>
+<li><strong>Branch:</strong> {{object.branch_id.name or ''}}</li>
+<li><strong>Date:</strong> {{object.date or ''}}</li>
+</ul>
+<p>Please investigate and resolve the variance.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+        <!-- NE-016: Bank reconciliation overdue (>5th of month) -->
+        <record id="notification_event_ne016" model="spsl.notification.template">
+            <field name="event_code">NE-016</field>
+            <field name="name">Bank Reconciliation Overdue</field>
+            <field name="description">Triggered when bank reconciliation is not completed by the 5th of the month. Notifies Finance Manager. Escalates to CFO on the 7th.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Bank Reconciliation Overdue — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Bank Reconciliation Overdue</strong></p>
+<p>Bank reconciliation has not been completed by the 5th of the month:</p>
+<ul>
+<li><strong>Bank Statement:</strong> {{object.name or ''}}</li>
+<li><strong>Period:</strong> {{object.date or ''}}</li>
+</ul>
+<p>Please complete the reconciliation immediately. This will escalate to the CFO on the 7th.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_finance_manager"/>
+            <field name="escalation_delay_hours">48</field>
+        </record>
+
+        <!-- NE-017: Monthly VAT return due in 5 days -->
+        <record id="notification_event_ne017" model="spsl.notification.template">
+            <field name="event_code">NE-017</field>
+            <field name="name">Monthly VAT Return Due in 5 Days</field>
+            <field name="description">Reminder that the monthly VAT return filing deadline is in 5 days. Notifies Finance Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">VAT Return Due in 5 Days</field>
+            <field name="body_template"><![CDATA[<p><strong>VAT Return Filing Reminder</strong></p>
+<p>The monthly VAT return filing deadline is in <strong>5 days</strong>.</p>
+<p>Please ensure all VAT data is prepared and the return is filed with NBR before the deadline.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_finance_manager"/>
+        </record>
+
+        <!-- NE-018: Quarterly TDS return due in 5 days -->
+        <record id="notification_event_ne018" model="spsl.notification.template">
+            <field name="event_code">NE-018</field>
+            <field name="name">Quarterly TDS Return Due in 5 Days</field>
+            <field name="description">Reminder that the quarterly TDS return filing deadline is in 5 days. Notifies Finance Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">TDS Return Due in 5 Days</field>
+            <field name="body_template"><![CDATA[<p><strong>TDS Return Filing Reminder</strong></p>
+<p>The quarterly TDS return filing deadline is in <strong>5 days</strong>.</p>
+<p>Please ensure all TDS data is prepared and the return is filed before the deadline.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_finance_manager"/>
+        </record>
+
+        <!-- NE-019: LC expiry in 30 days -->
+        <record id="notification_event_ne019" model="spsl.notification.template">
+            <field name="event_code">NE-019</field>
+            <field name="name">LC Expiry in 30 Days</field>
+            <field name="description">Letter of Credit expires in 30 days. Notifies Finance Manager and Purchase Officer.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">LC Expiry in 30 Days — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>An LC is approaching its expiry date in <strong>30 days</strong>:</p>
+<ul>
+<li><strong>LC:</strong> {{object.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Expiry Date:</strong> {{object.lc_expiry_date or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount or '0.00'}}</li>
+</ul>
+<p>Please arrange renewal or closure of the LC.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-020: LC expiry in 7 days -->
+        <record id="notification_event_ne020" model="spsl.notification.template">
+            <field name="event_code">NE-020</field>
+            <field name="name">LC Expiry in 7 Days</field>
+            <field name="description">Letter of Credit expires in 7 days. Urgent — notifies CFO and Finance Manager via Email + SMS.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">URGENT: LC Expiry in 7 Days — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>URGENT:</strong> An LC is expiring in <strong>7 days</strong>:</p>
+<ul>
+<li><strong>LC:</strong> {{object.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Expiry Date:</strong> {{object.lc_expiry_date or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount or '0.00'}}</li>
+</ul>
+<p>Immediate action is required to arrange renewal, amendment, or closure.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_sms'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+        <!-- NE-021: Unbanked cash limit exceeded (branch >BDT 50K) — MANDATORY -->
+        <record id="notification_event_ne021" model="spsl.notification.template">
+            <field name="event_code">NE-021</field>
+            <field name="name">Unbanked Cash Limit Exceeded</field>
+            <field name="description">Triggered when a branch holds unbanked cash exceeding BDT 50,000. Notifies Branch Manager and Finance Manager. Escalates to CFO if not resolved in 2 hours. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Unbanked Cash Limit Exceeded — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Unbanked Cash Limit Exceeded</strong></p>
+<p>Branch cash holdings have exceeded the BDT 50,000 unbanked limit:</p>
+<ul>
+<li><strong>Branch:</strong> {{object.name or ''}}</li>
+<li><strong>Unbanked Amount:</strong> {{object.unbanked_amount or '0.00'}}</li>
+</ul>
+<p>Please arrange immediate bank deposit. This will escalate to the CFO if not resolved within 2 hours.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_sms')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_branch_manager"/>
+            <field name="escalation_delay_hours">2</field>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Module: Procurement (NE-025 to NE-028)                        -->
+        <!-- BRD_12 §2.2 — Notification Event Catalog                      -->
+        <!-- ============================================================ -->
+
+        <!-- NE-025: Purchase requisition awaiting approval -->
+        <record id="notification_event_ne025" model="spsl.notification.template">
+            <field name="event_code">NE-025</field>
+            <field name="name">Purchase Requisition Awaiting Approval</field>
+            <field name="description">Triggered when a purchase requisition is submitted and awaits approval. Notifies the designated approver. Auto-escalates after 48 hours.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Purchase Requisition Awaiting Approval — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A purchase requisition requires your approval:</p>
+<ul>
+<li><strong>Requisition:</strong> {{object.name or ''}}</li>
+<li><strong>Requested By:</strong> {{object.user_id.name or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount_total or '0.00'}}</li>
+<li><strong>Date:</strong> {{object.date_order or ''}}</li>
+</ul>
+<p>Please review and approve or reject this requisition. This will auto-escalate if not actioned within 48 hours.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_approval_manager"/>
+            <field name="escalation_delay_hours">48</field>
+        </record>
+
+        <!-- NE-026: PO approved -->
+        <record id="notification_event_ne026" model="spsl.notification.template">
+            <field name="event_code">NE-026</field>
+            <field name="name">PO Approved</field>
+            <field name="description">Triggered when a purchase order is approved. Notifies Purchase Officer.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">PO Approved — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A purchase order has been approved:</p>
+<ul>
+<li><strong>PO:</strong> {{object.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount_total or '0.00'}}</li>
+<li><strong>Approved By:</strong> {{object.user_id.name or ''}}</li>
+</ul>
+<p>Please proceed with sending the PO to the vendor.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-027: PO overdue (delivery date passed, no GRN) -->
+        <record id="notification_event_ne027" model="spsl.notification.template">
+            <field name="event_code">NE-027</field>
+            <field name="name">PO Overdue (No GRN)</field>
+            <field name="description">Triggered when a PO delivery date has passed without a Goods Received Note. Notifies Purchase Officer and Operations Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">PO Overdue — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Purchase Order Overdue</strong></p>
+<p>The delivery date has passed and no GRN has been recorded:</p>
+<ul>
+<li><strong>PO:</strong> {{object.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Expected Delivery:</strong> {{object.date_planned or ''}}</li>
+<li><strong>Amount:</strong> {{object.amount_total or '0.00'}}</li>
+</ul>
+<p>Please follow up with the vendor regarding delivery status.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-028: 3-way match exception -->
+        <record id="notification_event_ne028" model="spsl.notification.template">
+            <field name="event_code">NE-028</field>
+            <field name="name">3-Way Match Exception</field>
+            <field name="description">Triggered when PO, GRN, and vendor invoice amounts do not match. Notifies Finance Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">3-Way Match Exception — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>3-Way Match Exception</strong></p>
+<p>A discrepancy has been detected between PO, GRN, and vendor invoice:</p>
+<ul>
+<li><strong>Invoice:</strong> {{object.name or ''}}</li>
+<li><strong>Vendor:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Invoice Amount:</strong> {{object.amount_total or '0.00'}}</li>
+</ul>
+<p>Please review the discrepancy and take corrective action before processing payment.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_finance_manager"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Module: Field Engineer (NE-030 to NE-037)                     -->
+        <!-- BRD_12 §2.2 — Notification Event Catalog                      -->
+        <!-- ============================================================ -->
+
+        <!-- NE-030: New service ticket created -->
+        <record id="notification_event_ne030" model="spsl.notification.template">
+            <field name="event_code">NE-030</field>
+            <field name="name">New Service Ticket Created</field>
+            <field name="description">Triggered when a new field service ticket is created. Notifies the assigned engineer via Push + SMS.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">New Service Ticket — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A new service ticket has been assigned to you:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Device:</strong> {{object.product_id.name or ''}}</li>
+<li><strong>Priority:</strong> {{object.priority or 'Normal'}}</li>
+</ul>
+<p>Please acknowledge and plan your visit.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_push')), (4, ref('spsl_core.channel_sms'))]"/>
+        </record>
+
+        <!-- NE-031: Service ticket not acknowledged within 1h -->
+        <record id="notification_event_ne031" model="spsl.notification.template">
+            <field name="event_code">NE-031</field>
+            <field name="name">Service Ticket Not Acknowledged (1h)</field>
+            <field name="description">Triggered when a service ticket is not acknowledged within 1 hour. Notifies Field Supervisor. Escalates to Branch Manager at 2 hours.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Unacknowledged Ticket — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A service ticket has not been acknowledged within 1 hour:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Assigned Engineer:</strong> {{object.user_id.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+</ul>
+<p>Please follow up with the engineer. This will escalate to Branch Manager at 2 hours.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_sms')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_branch_manager"/>
+            <field name="escalation_delay_hours">1</field>
+        </record>
+
+        <!-- NE-032: SLA response deadline in 1 hour -->
+        <record id="notification_event_ne032" model="spsl.notification.template">
+            <field name="event_code">NE-032</field>
+            <field name="name">SLA Response Deadline in 1 Hour</field>
+            <field name="description">Warning — SLA response deadline is approaching in 1 hour. Notifies Engineer and Field Supervisor.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">SLA Response in 1 Hour — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>SLA Warning:</strong> Response deadline in 1 hour:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+</ul>
+<p>Please respond immediately to avoid SLA breach.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_push')), (4, ref('spsl_core.channel_sms'))]"/>
+        </record>
+
+        <!-- NE-033: SLA response deadline breached -->
+        <record id="notification_event_ne033" model="spsl.notification.template">
+            <field name="event_code">NE-033</field>
+            <field name="name">SLA Response Deadline Breached</field>
+            <field name="description">SLA response deadline has been breached. Notifies Engineer, Field Supervisor, and Branch Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">SLA BREACH: Response — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>SLA Response Deadline Breached</strong></p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Assigned Engineer:</strong> {{object.user_id.name or ''}}</li>
+</ul>
+<p>Immediate response required. SLA penalty may apply.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_sms')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_branch_manager"/>
+        </record>
+
+        <!-- NE-034: SLA resolution deadline in 2 hours -->
+        <record id="notification_event_ne034" model="spsl.notification.template">
+            <field name="event_code">NE-034</field>
+            <field name="name">SLA Resolution Deadline in 2 Hours</field>
+            <field name="description">Warning — SLA resolution deadline is approaching in 2 hours. Notifies Engineer and Field Supervisor.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">SLA Resolution in 2 Hours — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>SLA Warning:</strong> Resolution deadline in 2 hours:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+</ul>
+<p>Please complete the resolution immediately to avoid SLA breach.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_push')), (4, ref('spsl_core.channel_sms'))]"/>
+        </record>
+
+        <!-- NE-035: SLA resolution deadline breached — MANDATORY -->
+        <record id="notification_event_ne035" model="spsl.notification.template">
+            <field name="event_code">NE-035</field>
+            <field name="name">SLA Resolution Deadline Breached</field>
+            <field name="description">SLA resolution deadline has been breached. Notifies Field Supervisor, Branch Manager, and MPS Manager. Escalates to Operations Director. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">CRITICAL: SLA Resolution Breached — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>CRITICAL: SLA Resolution Deadline Breached</strong></p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Customer:</strong> {{object.partner_id.name or ''}}</li>
+<li><strong>Assigned Engineer:</strong> {{object.user_id.name or ''}}</li>
+</ul>
+<p>This has been escalated to the Operations Director. Immediate corrective action required.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_sms')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+            <field name="escalation_delay_hours">2</field>
+        </record>
+
+        <!-- NE-036: Parts requisition approved -->
+        <record id="notification_event_ne036" model="spsl.notification.template">
+            <field name="event_code">NE-036</field>
+            <field name="name">Parts Requisition Approved</field>
+            <field name="description">Triggered when a parts requisition for a service ticket is approved. Notifies the engineer.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">Parts Requisition Approved — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Your parts requisition has been approved:</p>
+<ul>
+<li><strong>Requisition:</strong> {{object.name or ''}}</li>
+<li><strong>Ticket:</strong> {{object.origin or ''}}</li>
+</ul>
+<p>Please collect the parts and proceed with the service visit.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_push')), (4, ref('spsl_core.channel_in_app'))]"/>
+        </record>
+
+        <!-- NE-037: Job card completed -->
+        <record id="notification_event_ne037" model="spsl.notification.template">
+            <field name="event_code">NE-037</field>
+            <field name="name">Job Card Completed</field>
+            <field name="description">Triggered when a field engineer completes a job card. Sends email confirmation to the customer.</field>
+            <field name="recipient_type">document_follower</field>
+            <field name="subject_template">Service Completed — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.partner_id.name or 'Customer'}},</p>
+<p>Your service request has been completed:</p>
+<ul>
+<li><strong>Ticket:</strong> {{object.name or ''}}</li>
+<li><strong>Engineer:</strong> {{object.user_id.name or ''}}</li>
+<li><strong>Completed On:</strong> {{object.date_finished or ''}}</li>
+</ul>
+<p>If you have any concerns, please contact our support team.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Module: HR / Payroll (NE-040 to NE-044)                       -->
+        <!-- BRD_12 §2.2 — Notification Event Catalog                      -->
+        <!-- ============================================================ -->
+
+        <!-- NE-040: Payroll batch approved -->
+        <record id="notification_event_ne040" model="spsl.notification.template">
+            <field name="event_code">NE-040</field>
+            <field name="name">Payroll Batch Approved</field>
+            <field name="description">Triggered when a payroll batch is approved. Sends payslip PDF to all employees via email.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Payslip for {{object.period_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.employee_id.name or 'Employee'}},</p>
+<p>Your payslip for the period <strong>{{object.period_id.name or ''}}</strong> is ready.</p>
+<p>Please find the attached payslip PDF for your records.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.spsl_core_group_user"/>
+        </record>
+
+        <!-- NE-041: BEFTN file ready for bank submission -->
+        <record id="notification_event_ne041" model="spsl.notification.template">
+            <field name="event_code">NE-041</field>
+            <field name="name">BEFTN File Ready for Bank Submission</field>
+            <field name="description">Triggered when the BEFTN salary disbursement file is generated. Notifies Payroll Officer and CFO.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">BEFTN File Ready — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>The BEFTN salary disbursement file has been generated:</p>
+<ul>
+<li><strong>Payroll Batch:</strong> {{object.name or ''}}</li>
+<li><strong>Period:</strong> {{object.period_id.name or ''}}</li>
+</ul>
+<p>Please submit the file to the bank for processing.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+        <!-- NE-042: Salary not credited (3 days after payroll run) -->
+        <record id="notification_event_ne042" model="spsl.notification.template">
+            <field name="event_code">NE-042</field>
+            <field name="name">Salary Not Credited (3 Days After Payroll)</field>
+            <field name="description">Triggered 3 days after payroll run when salary has not been credited. Notifies HR Manager and CFO.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Salary Not Credited — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Salary Not Credited</strong></p>
+<p>It has been 3 days since the payroll run and salary has not been credited:</p>
+<ul>
+<li><strong>Payroll Batch:</strong> {{object.name or ''}}</li>
+<li><strong>Period:</strong> {{object.period_id.name or ''}}</li>
+</ul>
+<p>Please follow up with the bank and confirm salary disbursement.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_cfo"/>
+        </record>
+
+        <!-- NE-043: Employee contract expiry in 30 days -->
+        <record id="notification_event_ne043" model="spsl.notification.template">
+            <field name="event_code">NE-043</field>
+            <field name="name">Employee Contract Expiry in 30 Days</field>
+            <field name="description">Reminder that an employee contract expires in 30 days. Notifies HR Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Contract Expiry in 30 Days — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>An employee contract is expiring in <strong>30 days</strong>:</p>
+<ul>
+<li><strong>Employee:</strong> {{object.name or ''}}</li>
+<li><strong>Department:</strong> {{object.department_id.name or ''}}</li>
+<li><strong>Contract End:</strong> {{object.date_end or ''}}</li>
+</ul>
+<p>Please initiate contract renewal or separation process.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.spsl_core_group_manager"/>
+        </record>
+
+        <!-- NE-044: Leave request awaiting approval -->
+        <record id="notification_event_ne044" model="spsl.notification.template">
+            <field name="event_code">NE-044</field>
+            <field name="name">Leave Request Awaiting Approval</field>
+            <field name="description">Triggered when an employee submits a leave request. Notifies the employee's manager. Auto-escalates to HR Manager after 48 hours.</field>
+            <field name="recipient_type">manager</field>
+            <field name="subject_template">Leave Request — {{object.employee_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>A leave request requires your approval:</p>
+<ul>
+<li><strong>Employee:</strong> {{object.employee_id.name or ''}}</li>
+<li><strong>Leave Type:</strong> {{object.holiday_status_id.name or ''}}</li>
+<li><strong>From:</strong> {{object.date_from or ''}}</li>
+<li><strong>To:</strong> {{object.date_to or ''}}</li>
+<li><strong>Duration:</strong> {{object.number_of_days or '0'}} days</li>
+</ul>
+<p>Please approve or reject this request. This will auto-escalate to HR Manager after 48 hours.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="escalation_delay_hours">48</field>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Module: Inventory (NE-045 to NE-047)                          -->
+        <!-- BRD_12 §2.2 — Notification Event Catalog                      -->
+        <!-- ============================================================ -->
+
+        <!-- NE-045: Stock below reorder point -->
+        <record id="notification_event_ne045" model="spsl.notification.template">
+            <field name="event_code">NE-045</field>
+            <field name="name">Stock Below Reorder Point</field>
+            <field name="description">Triggered when product stock falls below the minimum reorder level. Notifies Inventory Manager and Purchase Officer.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Low Stock Alert: {{object.product_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Low Stock Alert</strong></p>
+<ul>
+<li><strong>Product:</strong> {{object.product_id.name or ''}}</li>
+<li><strong>Current Quantity:</strong> {{object.quantity or '0'}}</li>
+<li><strong>Reorder Point:</strong> {{object.reordering_min_qty or '0'}}</li>
+<li><strong>Location:</strong> {{object.location_id.name or ''}}</li>
+</ul>
+<p>Please initiate a purchase order to replenish stock.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+        <!-- NE-046: Inter-branch transfer request awaiting approval -->
+        <record id="notification_event_ne046" model="spsl.notification.template">
+            <field name="event_code">NE-046</field>
+            <field name="name">Inter-Branch Transfer Awaiting Approval</field>
+            <field name="description">Triggered when an inter-branch stock transfer request is submitted. Notifies destination branch Inventory Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Inter-Branch Transfer Request — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p>An inter-branch transfer request requires your approval:</p>
+<ul>
+<li><strong>Transfer:</strong> {{object.name or ''}}</li>
+<li><strong>Source:</strong> {{object.location_id.name or ''}}</li>
+<li><strong>Destination:</strong> {{object.location_dest_id.name or ''}}</li>
+<li><strong>Scheduled Date:</strong> {{object.scheduled_date or ''}}</li>
+</ul>
+<p>Please review and approve or reject this transfer.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_branch_manager"/>
+        </record>
+
+        <!-- NE-047: Expiry approaching (consumable batch within 60 days) -->
+        <record id="notification_event_ne047" model="spsl.notification.template">
+            <field name="event_code">NE-047</field>
+            <field name="name">Consumable Batch Expiry Approaching (60 Days)</field>
+            <field name="description">Triggered when a consumable batch is within 60 days of expiry. Notifies Inventory Manager.</field>
+            <field name="recipient_type">role_group</field>
+            <field name="subject_template">Expiry Approaching: {{object.product_id.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Batch Expiry Warning</strong></p>
+<ul>
+<li><strong>Product:</strong> {{object.product_id.name or ''}}</li>
+<li><strong>Batch:</strong> {{object.lot_id.name or ''}}</li>
+<li><strong>Expiry Date:</strong> {{object.expiration_date or ''}}</li>
+<li><strong>Quantity:</strong> {{object.quantity or '0'}}</li>
+</ul>
+<p>Please plan usage or disposal before the expiry date.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_group_id" ref="spsl_core.group_spsl_operations_manager"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- Module: System / Security (NE-050 to NE-056)                  -->
+        <!-- BRD_12 §2.2 — Notification Event Catalog                      -->
+        <!-- ============================================================ -->
+
+        <!-- NE-050: Failed login (3 consecutive attempts) -->
+        <record id="notification_event_ne050" model="spsl.notification.template">
+            <field name="event_code">NE-050</field>
+            <field name="name">Failed Login (3 Consecutive Attempts)</field>
+            <field name="description">Triggered when 3 consecutive failed login attempts are detected. Notifies System Administrator.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Security Alert: Failed Login Attempts</field>
+            <field name="body_template"><![CDATA[<p><strong>Security Alert</strong></p>
+<p>Three consecutive failed login attempts have been detected:</p>
+<ul>
+<li><strong>Username:</strong> {{object.login or ''}}</li>
+<li><strong>IP Address:</strong> {{object.login_ip or ''}}</li>
+<li><strong>Time:</strong> {{object.login_date or ''}}</li>
+</ul>
+<p>Please investigate whether this is an unauthorized access attempt.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-051: New user account created -->
+        <record id="notification_event_ne051" model="spsl.notification.template">
+            <field name="event_code">NE-051</field>
+            <field name="name">New User Account Created</field>
+            <field name="description">Triggered when a new user account is created. Sends welcome email to the new user and notifies IT Support.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Welcome to SPSL ERP</field>
+            <field name="body_template"><![CDATA[<p>Dear {{object.name or ''}},</p>
+<p>Your account has been created on the SPSL ERP system.</p>
+<p>Please log in and set your password. If you need assistance, please contact IT Support.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-052: Backup job failed — MANDATORY -->
+        <record id="notification_event_ne052" model="spsl.notification.template">
+            <field name="event_code">NE-052</field>
+            <field name="name">Backup Job Failed</field>
+            <field name="description">Triggered when a scheduled database backup job fails. Notifies System Administrator. MANDATORY — cannot be disabled.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">CRITICAL: Backup Job Failed</field>
+            <field name="body_template"><![CDATA[<p><strong>CRITICAL: Backup Job Failed</strong></p>
+<p>A scheduled database backup job has failed.</p>
+<p>Please investigate immediately and re-trigger the backup manually.</p>
+<p>Database backups are critical for disaster recovery. Do not ignore this alert.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_sms'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-053: Server disk usage > 80% -->
+        <record id="notification_event_ne053" model="spsl.notification.template">
+            <field name="event_code">NE-053</field>
+            <field name="name">Server Disk Usage > 80%</field>
+            <field name="description">Triggered when server disk usage exceeds 80%. Notifies System Administrator. Escalates to SMS at >90%.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Server Disk Usage Alert</field>
+            <field name="body_template"><![CDATA[<p><strong>Server Disk Usage Alert</strong></p>
+<p>Server disk usage has exceeded <strong>80%</strong>.</p>
+<p>Please review disk usage and free up space. If usage exceeds 90%, an SMS alert will be sent.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email')), (4, ref('spsl_core.channel_in_app'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+            <field name="escalation_delay_hours">1</field>
+        </record>
+
+        <!-- NE-054: Database replication lag > 5 min -->
+        <record id="notification_event_ne054" model="spsl.notification.template">
+            <field name="event_code">NE-054</field>
+            <field name="name">Database Replication Lag > 5 Min</field>
+            <field name="description">Triggered when database replication lag exceeds 5 minutes. Notifies System Administrator via SMS.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Database Replication Lag Alert</field>
+            <field name="body_template"><![CDATA[<p><strong>Database Replication Lag Alert</strong></p>
+<p>Database replication lag has exceeded <strong>5 minutes</strong>.</p>
+<p>Please investigate the replication status immediately.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_sms'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-055: Scheduled batch job failed -->
+        <record id="notification_event_ne055" model="spsl.notification.template">
+            <field name="event_code">NE-055</field>
+            <field name="name">Scheduled Batch Job Failed</field>
+            <field name="description">Triggered when a scheduled batch job fails. Notifies System Administrator and module owner.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">Batch Job Failed — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>Scheduled Batch Job Failed</strong></p>
+<ul>
+<li><strong>Job:</strong> {{object.name or ''}}</li>
+<li><strong>Scheduled Time:</strong> {{object.nextcall or ''}}</li>
+</ul>
+<p>Please investigate the failure and re-trigger the job after resolving the issue.</p>]]></field>
+            <field name="is_mandatory">False</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- NE-056: API integration error -->
+        <record id="notification_event_ne056" model="spsl.notification.template">
+            <field name="event_code">NE-056</field>
+            <field name="name">API Integration Error (bKash / Nagad / NBR)</field>
+            <field name="description">Triggered when an external API integration error occurs. Notifies System Administrator and Integration Owner. 3 consecutive errors trigger SMS to CFO.</field>
+            <field name="recipient_type">specific_user</field>
+            <field name="subject_template">API Integration Error — {{object.name or ''}}</field>
+            <field name="body_template"><![CDATA[<p><strong>API Integration Error</strong></p>
+<ul>
+<li><strong>Integration:</strong> {{object.name or ''}}</li>
+<li><strong>Error:</strong> {{object.error_message or 'Unknown error'}}</li>
+</ul>
+<p>Please investigate. If 3 consecutive errors occur, an SMS alert will be sent to the CFO.</p>]]></field>
+            <field name="is_mandatory">True</field>
+            <field name="active">True</field>
+            <field name="channels" eval="[(4, ref('spsl_core.channel_email'))]"/>
+            <field name="recipient_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+            <field name="escalation_delay_hours">1</field>
+        </record>
+
+    </data>
+</odoo>

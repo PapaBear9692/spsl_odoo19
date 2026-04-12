@@ -439,21 +439,20 @@ class AuditLog(models.Model):
             except Exception as e:
                 pass
         
-        self.env['spsl.audit.log'].sudo().create({
-            'model_name': self._name,
-            'record_id': 0,
-            'record_name': f'Audit Retention Run - {archived_count} records archived',
-            'action': 'write',
-            'user_id': self.env.user.id,
-            'field_changes': 'archived, archived_date',
-            'old_values': json.dumps({'archived': False}),
-            'new_values': json.dumps({
+        self.sudo()._log_action(
+            model_name=self._name,
+            record_id=0,
+            action='write',
+            record_name=f'Audit Retention Run - {archived_count} records archived',
+            field_changes='archived, archived_date',
+            old_values=json.dumps({'archived': False}),
+            new_values=json.dumps({
                 'archived': True,
                 'archived_count': archived_count,
                 'retention_years': retention_years,
                 'cutoff_date': str(cutoff_date),
             }),
-        })
+        )
         
         return {
             'archived_count': archived_count,
@@ -511,55 +510,3 @@ All records are valid.
             'target': 'new',
         }
 
-
-# ------------------------------------------------------------------
-# Legacy button methods (kept for backward compatibility)
-# ------------------------------------------------------------------
-
-def action_verify_integrity(self):
-    """Run full audit chain integrity check and show result."""
-    result = self.verify_chain_integrity()
-
-    if result['broken']:
-        message = f"""
-Audit Chain Broken!
-
-Total Checked: {result['total_checked']}
-Valid: {result['valid']}
-Broken: {len(result['broken'])}
-
-First Broken Record:
-ID: {result['broken'][0]['id']}
-Name: {result['broken'][0]['name']}
-"""
-        notif_type = 'danger'
-    else:
-        message = f"""
-Audit Chain Verified Successfully!
-
-Total Checked: {result['total_checked']}
-All records are valid.
-"""
-        notif_type = 'success'
-
-    return {
-        'type': 'ir.actions.client',
-        'tag': 'display_notification',
-        'params': {
-            'title': 'Audit Integrity Check',
-            'message': message,
-            'type': notif_type,
-            'sticky': True,
-        }
-    }
-
-
-def action_verify_chain(self):
-    """Open wizard for advanced audit chain verification."""
-    return {
-        'type': 'ir.actions.act_window',
-        'name': 'Verify Audit Chain',
-        'res_model': 'spsl.audit.chain.verify.wizard',
-        'view_mode': 'form',
-        'target': 'new',
-    }
