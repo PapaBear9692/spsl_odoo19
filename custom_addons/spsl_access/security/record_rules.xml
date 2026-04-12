@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="0">
+
+    <!--
+        TASK 3.6.6 — Branch isolation record rules.
+
+        Confirmed operating_unit_id field presence (via ir_model_fields):
+          sale.order    → YES (operating_unit_id)
+          account.move  → YES (operating_unit_id)
+          purchase.order → NO  (operating_unit module not extended to PO in this build)
+
+        purchase.order rule is commented out until the OU field is added.
+    -->
+
+    <!-- ── sale.order write/create restriction for branch roles ── -->
+    <record id="rule_sale_order_branch_write" model="ir.rule">
+        <field name="name">SPSL: Sale Order branch write isolation</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="groups" eval="[
+            Command.link(ref('spsl_access.group_sales_manager')),
+            Command.link(ref('spsl_access.group_sales_representative')),
+            Command.link(ref('spsl_access.group_branch_manager')),
+            Command.link(ref('spsl_access.group_mps_coordinator')),
+        ]"/>
+        <field name="domain_force">
+            ['|', ('operating_unit_id', '=', False),
+                  ('operating_unit_id', 'in', user.operating_unit_ids.ids)]
+        </field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ── account.move write/create for branch accountant ── -->
+    <record id="rule_account_move_branch_write" model="ir.rule">
+        <field name="name">SPSL: Account Move branch write isolation</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[
+            Command.link(ref('spsl_access.group_accountant_branch')),
+            Command.link(ref('spsl_access.group_branch_manager')),
+        ]"/>
+        <field name="domain_force">
+            ['|', ('operating_unit_id', '=', False),
+                  ('operating_unit_id', 'in', user.operating_unit_ids.ids)]
+        </field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!--
+        purchase.order branch isolation — operating_unit_id not present on
+        purchase.order in this build. The operating_unit_purchase (or similar)
+        community module needs to be installed to extend PO with OU field.
+        Uncomment once that module is installed.
+
+    <record id="rule_purchase_order_branch_write" model="ir.rule">
+        <field name="name">SPSL: Purchase Order branch write isolation</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="groups" eval="[
+            Command.link(ref('spsl_access.group_purchase_officer')),
+            Command.link(ref('spsl_access.group_branch_manager')),
+        ]"/>
+        <field name="domain_force">
+            ['|', ('operating_unit_id', '=', False),
+                  ('operating_unit_id', 'in', user.operating_unit_ids.ids)]
+        </field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    -->
+
+    <!-- ── Auditor: read-only enforcement ── -->
+    <record id="rule_auditor_sale_readonly" model="ir.rule">
+        <field name="name">SPSL: Auditor read-only sale.order</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_auditor_move_readonly" model="ir.rule">
+        <field name="name">SPSL: Auditor read-only account.move</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ── BI Analyst: read-only on key models ── -->
+    <record id="rule_bi_sale_readonly" model="ir.rule">
+        <field name="name">SPSL: BI Analyst read-only sale.order</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_bi_analyst'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_bi_move_readonly" model="ir.rule">
+        <field name="name">SPSL: BI Analyst read-only account.move</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_bi_analyst'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ── IT Support: block accounting access ── -->
+    <record id="rule_it_support_no_accounting" model="ir.rule">
+        <field name="name">SPSL: IT Support no accounting access</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_it_support'))]"/>
+        <field name="domain_force">[(0, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_it_support_no_move_line" model="ir.rule">
+        <field name="name">SPSL: IT Support no move line access</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_it_support'))]"/>
+        <field name="domain_force">[(0, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_it_support_no_journal" model="ir.rule">
+        <field name="name">SPSL: IT Support no journal access</field>
+        <field name="model_id" ref="account.model_account_journal"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_it_support'))]"/>
+        <field name="domain_force">[(0, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_it_support_no_payment" model="ir.rule">
+        <field name="name">SPSL: IT Support no payment access</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_it_support'))]"/>
+        <field name="domain_force">[(0, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_it_support_no_account" model="ir.rule">
+        <field name="name">SPSL: IT Support no chart of accounts</field>
+        <field name="model_id" ref="account.model_account_account"/>
+        <field name="groups" eval="[Command.link(ref('spsl_access.group_it_support'))]"/>
+        <field name="domain_force">[(0, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</data>
+</odoo>

@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="0">
+
+    <!--
+        SPSL Access Control — 25 Role Groups
+        Odoo 19 CE: res.groups has no category_id field.
+        Groups are prefixed "SPSL / " so they appear grouped by
+        the slash convention in Settings > Users & Companies > Groups.
+    -->
+
+    <!-- ============================================================
+         TASK 3.6.1 — EXECUTIVE AND FINANCE (8 groups)
+    ============================================================ -->
+
+    <record id="group_system_administrator" model="res.groups">
+        <field name="name">SPSL / System Administrator</field>
+        <field name="sequence">1</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_system')),
+            Command.link(ref('account.group_account_manager')),
+            Command.link(ref('sales_team.group_sale_manager')),
+            Command.link(ref('purchase.group_purchase_manager')),
+            Command.link(ref('stock.group_stock_manager')),
+            Command.link(ref('hr.group_hr_manager')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_managing_director" model="res.groups">
+        <field name="name">SPSL / Managing Director</field>
+        <field name="sequence">2</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('account.group_account_user')),
+            Command.link(ref('sales_team.group_sale_salesman')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_cfo" model="res.groups">
+        <field name="name">SPSL / Chief Financial Officer</field>
+        <field name="sequence">3</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('account.group_account_manager')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_finance_manager_hq" model="res.groups">
+        <field name="name">SPSL / Finance Manager (HQ)</field>
+        <field name="sequence">4</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('account.group_account_manager')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_accountant_hq" model="res.groups">
+        <field name="name">SPSL / Accountant (HQ)</field>
+        <field name="sequence">5</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('account.group_account_user')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_accountant_branch" model="res.groups">
+        <field name="name">SPSL / Accountant (Branch)</field>
+        <field name="sequence">6</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('account.group_account_user')),
+        ]"/>
+    </record>
+
+    <record id="group_auditor" model="res.groups">
+        <field name="name">SPSL / Auditor</field>
+        <field name="sequence">7</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_fixed_asset_manager" model="res.groups">
+        <field name="name">SPSL / Fixed Asset Manager</field>
+        <field name="sequence">8</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('account.group_account_user')),
+        ]"/>
+    </record>
+
+    <!-- ============================================================
+         TASK 3.6.2 — SALES AND CRM (5 groups)
+    ============================================================ -->
+
+    <record id="group_sales_director" model="res.groups">
+        <field name="name">SPSL / Sales Director</field>
+        <field name="sequence">9</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('sales_team.group_sale_manager')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_sales_manager" model="res.groups">
+        <field name="name">SPSL / Sales Manager</field>
+        <field name="sequence">10</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('sales_team.group_sale_manager')),
+        ]"/>
+    </record>
+
+    <record id="group_sales_representative" model="res.groups">
+        <field name="name">SPSL / Sales Representative</field>
+        <field name="sequence">11</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('sales_team.group_sale_salesman')),
+        ]"/>
+    </record>
+
+    <record id="group_sales_agent_portal" model="res.groups">
+        <field name="name">SPSL / Sales Agent (Portal)</field>
+        <field name="sequence">12</field>
+        <field name="share" eval="True"/>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_portal')),
+        ]"/>
+    </record>
+
+    <record id="group_mps_manager" model="res.groups">
+        <field name="name">SPSL / MPS Manager</field>
+        <field name="sequence">13</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('sales_team.group_sale_salesman')),
+            Command.link(ref('account.group_account_user')),
+        ]"/>
+    </record>
+
+    <!-- ============================================================
+         TASK 3.6.3 — OPERATIONS AND SUPPLY CHAIN (4 groups)
+    ============================================================ -->
+
+    <record id="group_mps_coordinator" model="res.groups">
+        <field name="name">SPSL / MPS Coordinator</field>
+        <field name="sequence">14</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('sales_team.group_sale_salesman')),
+        ]"/>
+    </record>
+
+    <record id="group_operations_manager" model="res.groups">
+        <field name="name">SPSL / Operations Manager</field>
+        <field name="sequence">15</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('stock.group_stock_manager')),
+            Command.link(ref('purchase.group_purchase_manager')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_inventory_manager" model="res.groups">
+        <field name="name">SPSL / Inventory Manager</field>
+        <field name="sequence">16</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('stock.group_stock_manager')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_purchase_officer" model="res.groups">
+        <field name="name">SPSL / Purchase Officer</field>
+        <field name="sequence">17</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('purchase.group_purchase_user')),
+        ]"/>
+    </record>
+
+    <!-- ============================================================
+         TASK 3.6.4 — FIELD SERVICE AND ENGINEERING (4 groups)
+    ============================================================ -->
+
+    <record id="group_field_engineer" model="res.groups">
+        <field name="name">SPSL / Field Engineer</field>
+        <field name="sequence">18</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+        ]"/>
+    </record>
+
+    <record id="group_field_supervisor" model="res.groups">
+        <field name="name">SPSL / Field Supervisor</field>
+        <field name="sequence">19</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+        ]"/>
+    </record>
+
+    <record id="group_hr_manager" model="res.groups">
+        <field name="name">SPSL / HR Manager</field>
+        <field name="sequence">20</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('hr.group_hr_manager')),
+        ]"/>
+    </record>
+
+    <record id="group_payroll_officer" model="res.groups">
+        <field name="name">SPSL / Payroll Officer</field>
+        <field name="sequence">21</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('hr.group_hr_user')),
+        ]"/>
+    </record>
+
+    <!-- ============================================================
+         TASK 3.6.5 — SUPPORT AND PORTAL (4 groups)
+    ============================================================ -->
+
+    <record id="group_branch_manager" model="res.groups">
+        <field name="name">SPSL / Branch Manager</field>
+        <field name="sequence">22</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('account.group_account_user')),
+            Command.link(ref('sales_team.group_sale_salesman')),
+            Command.link(ref('stock.group_stock_user')),
+            Command.link(ref('purchase.group_purchase_user')),
+        ]"/>
+    </record>
+
+    <record id="group_bi_analyst" model="res.groups">
+        <field name="name">SPSL / BI Analyst</field>
+        <field name="sequence">23</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('operating_unit_access_all.group_all_operating_unit')),
+        ]"/>
+    </record>
+
+    <record id="group_it_support" model="res.groups">
+        <field name="name">SPSL / IT Support</field>
+        <field name="sequence">24</field>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_user')),
+            Command.link(ref('base.group_system')),
+        ]"/>
+    </record>
+
+    <record id="group_customer_portal" model="res.groups">
+        <field name="name">SPSL / Customer (Portal)</field>
+        <field name="sequence">25</field>
+        <field name="share" eval="True"/>
+        <field name="implied_ids" eval="[
+            Command.link(ref('base.group_portal')),
+        ]"/>
+    </record>
+
+    <!-- ============================================================
+         GROUP INHERITANCE HIERARCHY (SPSL group → SPSL group)
+         Added AFTER all groups are defined so forward-references
+         resolve correctly.
+    ============================================================ -->
+
+    <!-- Finance: CFO → Finance Manager (HQ) → Accountant (HQ) -->
+    <record id="group_cfo" model="res.groups">
+        <field name="implied_ids" eval="[
+            Command.link(ref('spsl_access.group_finance_manager_hq')),
+        ]"/>
+    </record>
+
+    <record id="group_finance_manager_hq" model="res.groups">
+        <field name="implied_ids" eval="[
+            Command.link(ref('spsl_access.group_accountant_hq')),
+        ]"/>
+    </record>
+
+    <!-- Sales: Sales Director → Sales Manager → Sales Representative -->
+    <record id="group_sales_director" model="res.groups">
+        <field name="implied_ids" eval="[
+            Command.link(ref('spsl_access.group_sales_manager')),
+        ]"/>
+    </record>
+
+    <record id="group_sales_manager" model="res.groups">
+        <field name="implied_ids" eval="[
+            Command.link(ref('spsl_access.group_sales_representative')),
+        ]"/>
+    </record>
+
+    <!-- Field Service: Field Supervisor → Field Engineer -->
+    <record id="group_field_supervisor" model="res.groups">
+        <field name="implied_ids" eval="[
+            Command.link(ref('spsl_access.group_field_engineer')),
+        ]"/>
+    </record>
+
+    <!-- HR: HR Manager → Payroll Officer + Payroll Manager + Leave Manager -->
+    <record id="group_hr_manager" model="res.groups">
+        <field name="implied_ids" eval="[
+            Command.link(ref('spsl_access.group_payroll_officer')),
+            Command.link(ref('hr_payroll_community.group_hr_payroll_community_manager')),
+            Command.link(ref('hr_holidays.group_hr_holidays_manager')),
+        ]"/>
+    </record>
+
+    <!-- Payroll Officer → Payroll Community User -->
+    <record id="group_payroll_officer" model="res.groups">
+        <field name="implied_ids" eval="[
+            Command.link(ref('hr_payroll_community.group_hr_payroll_community_user')),
+        ]"/>
+    </record>
+
+</data>
+</odoo>

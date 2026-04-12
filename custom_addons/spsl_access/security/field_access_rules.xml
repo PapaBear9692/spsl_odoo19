@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="0">
+
+    <!--
+        TASK 3.6.7 — Field-level access for sensitive data.
+
+        (a) Employee salary (wage) — ACTIVE.
+            Python model override in models/hr_version.py expands the
+            field-level `groups` attribute on hr.version.wage and
+            hr.version.contract_wage to include SPSL Payroll Officer and
+            CFO (in addition to the default hr.group_hr_manager).
+
+            View-level: the employee "Payroll" page is normally restricted
+            to hr.group_hr_manager only. We expand it here so that Payroll
+            Officer and CFO can see salary data without full HR admin access.
+            Other contract fields (dates, type, etc.) remain hidden because
+            they have their own Python-level groups="hr.group_hr_manager".
+
+        (b) Commission field — PENDING: custom SPSL field not yet defined.
+
+        (c) Vendor bank_ids — active below.
+        (d) TIN/BIN vat field  — active below.
+    -->
+
+    <!-- ============================================================
+         (a) Employee Payroll page — expand visibility to include
+             Payroll Officer and CFO (salary fields visible only to
+             these roles via Python model override in models/hr_version.py)
+    ============================================================ -->
+    <record id="view_employee_payroll_page_spsl" model="ir.ui.view">
+        <field name="name">hr.employee.payroll.page.spsl</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='payroll_information']" position="attributes">
+                <attribute name="groups">hr.group_hr_manager,spsl_access.group_payroll_officer,spsl_access.group_cfo</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         (c) Vendor bank details — Finance roles only
+    ============================================================ -->
+    <record id="view_partner_bank_restrict" model="ir.ui.view">
+        <field name="name">res.partner.bank.field.restrict</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bank_ids']" position="attributes">
+                <attribute name="groups">spsl_access.group_finance_manager_hq,spsl_access.group_accountant_hq,spsl_access.group_accountant_branch,spsl_access.group_cfo,spsl_access.group_system_administrator</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         (d) TIN/BIN (vat) field on partners — Finance roles only
+    ============================================================ -->
+    <record id="view_partner_vat_restrict" model="ir.ui.view">
+        <field name="name">res.partner.vat.field.restrict</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="groups">spsl_access.group_finance_manager_hq,spsl_access.group_accountant_hq,spsl_access.group_accountant_branch,spsl_access.group_cfo,spsl_access.group_managing_director,spsl_access.group_system_administrator,spsl_access.group_auditor</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+    <record id="view_partner_commission_restrict" model="ir.ui.view">
+        <field name="name">res.partner.commission.field.restrict</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='commission']" position="attributes">
+                <attribute name="groups">spsl_access.group_sales_director,spsl_access.group_cfo,spsl_access.group_system_administrator</attribute>
+            </xpath>
+        </field>
+    </record>
+    -->
+
+</data>
+</odoo>
